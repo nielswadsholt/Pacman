@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Pacman</string>
+    <string name="points">Points:</string>
+    <string name="move_right">Move Rigth</string>
+</resources>
