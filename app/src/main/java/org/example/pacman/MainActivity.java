@@ -7,7 +7,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import static android.R.attr.button;
 
@@ -21,10 +24,12 @@ public class MainActivity extends Activity {
         //saying we want the game to run in one mode only
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
+
         gameView =  findViewById(R.id.gameView);
+        TextView textView = findViewById(R.id.points);
 
 
-        game = new Game(this);
+        game = new Game(this,textView);
         game.setGameView(gameView);
         gameView.setGame(game);
 

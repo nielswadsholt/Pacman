@@ -3,6 +3,9 @@ package org.example.pacman;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -13,16 +16,20 @@ import java.util.ArrayList;
 
 public class Game {
     private Context context;
+    private int points = 0; //how points do we have
 
-    Bitmap pacBitmap;
+    private Bitmap pacBitmap;
+    private TextView pointsView;
     private int pacx, pacy;
+    //empty list)
     private ArrayList<GoldCoin> coins = new ArrayList<>();
     private GameView gameView;
     private int h,w; //height and width of screen
 
-    public Game(Context context)
+    public Game(Context context, TextView view)
     {
         this.context = context;
+        this.pointsView = view;
         pacBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.pacman);
 
     }
@@ -37,6 +44,9 @@ public class Game {
     {
         pacx = 50;
         pacy = 400; //just some starting coordinates
+        //reset the points
+        points = 0;
+        pointsView.setText(context.getResources().getString(R.string.points)+" "+points);
         gameView.invalidate(); //redraw screen
     }
 
@@ -51,8 +61,17 @@ public class Game {
         //still within our boundaries?
         if (pacx+pixels+pacBitmap.getWidth()<w) {
             pacx = pacx + pixels;
+            doCollisionCheck();
             gameView.invalidate();
         }
+    }
+
+    //TODO check if the pacman touches a gold coin
+    //and if yes, then update the neccesseary data
+    //for the gold coins and the points
+    public void doCollisionCheck()
+    {
+
     }
 
     public int getPacx()
@@ -63,6 +82,11 @@ public class Game {
     public int getPacy()
     {
         return pacy;
+    }
+
+    public int getPoints()
+    {
+        return points;
     }
 
     public Bitmap getPacBitmap()
