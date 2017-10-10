@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -87,6 +86,11 @@ public class Game {
     public int getPoints()
     {
         return points;
+    }
+
+    public ArrayList<GoldCoin> getCoins()
+    {
+        return coins;
     }
 
     public Bitmap getPacBitmap()
