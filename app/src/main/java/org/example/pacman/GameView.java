@@ -46,18 +46,16 @@ public class GameView extends View {
 		//Here we get the height and weight
 		h = canvas.getHeight();
 		w = canvas.getWidth();
+		//update the size for the canvas to the game.
 		game.setSize(h,w);
 		Log.d("GAMEVIEW","h = "+h+", w = "+w);
 		//Making a new paint object
 		Paint paint = new Paint();
 		canvas.drawColor(Color.WHITE); //clear entire canvas to white color
 
+		//draw the pacman
 		canvas.drawBitmap(game.getPacBitmap(), game.getPacx(),game.getPacy(), paint);
 		super.onDraw(canvas);
 	}
 
 }
-
-
-
-

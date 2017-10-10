@@ -14,14 +14,18 @@ import java.util.ArrayList;
  */
 
 public class Game {
+    //context is a reference to the activity
     private Context context;
     private int points = 0; //how points do we have
 
+    //bitmap of the pacman
     private Bitmap pacBitmap;
+    //textview reference to points
     private TextView pointsView;
     private int pacx, pacy;
-    //empty list)
+    //the list of goldcoins - initially empty
     private ArrayList<GoldCoin> coins = new ArrayList<>();
+    //a reference to the gameview
     private GameView gameView;
     private int h,w; //height and width of screen
 
@@ -68,6 +72,8 @@ public class Game {
     //TODO check if the pacman touches a gold coin
     //and if yes, then update the neccesseary data
     //for the gold coins and the points
+    //so you need to go through the arraylist of goldcoins and
+    //check each of them for a collision with the pacman
     public void doCollisionCheck()
     {
 
