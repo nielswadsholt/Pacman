@@ -15,7 +15,9 @@ import org.w3c.dom.Text;
 import static android.R.attr.button;
 
 public class MainActivity extends Activity {
+    //reference to the main view
     GameView gameView;
+    //reference to the game class.
     Game game;
 
     @Override
@@ -34,7 +36,6 @@ public class MainActivity extends Activity {
         gameView.setGame(game);
 
         game.newGame();
-
 
         Button buttonRight = findViewById(R.id.moveRight);
         //listener of our pacman, when somebody clicks it
@@ -66,6 +67,9 @@ public class MainActivity extends Activity {
         int id = item.getItemId();
         if (id == R.id.action_settings) {
             Toast.makeText(this,"settings clicked",Toast.LENGTH_LONG).show();
+            return true;
+        } else if (id == R.id.action_newGame) {
+            Toast.makeText(this,"New Game clicked",Toast.LENGTH_LONG).show();
             return true;
         }
         return super.onOptionsItemSelected(item);

@@ -3,6 +3,12 @@
     tools:context="org.example.canvasdemo.MainActivity" >
 
     <item
+        android:id="@+id/action_newGame"
+        android:orderInCategory="100"
+        android:showAsAction="always"
+        android:title="@string/newgame"/>
+
+    <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:showAsAction="never"
