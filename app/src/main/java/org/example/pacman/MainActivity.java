@@ -10,9 +10,6 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
-import static android.R.attr.button;
 
 public class MainActivity extends Activity {
     //reference to the main view
