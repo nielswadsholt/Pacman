@@ -13,12 +13,13 @@ public class GameView extends View {
 
 	Game game;
     int h,w; //used for storing our height and width of the view
+    //Making a new paint object
+    Paint paint = new Paint();
 
 	public void setGame(Game game)
 	{
 		this.game = game;
 	}
-
 
 	/* The next 3 constructors are needed for the Android view system,
 	when we have a custom view.
@@ -32,7 +33,6 @@ public class GameView extends View {
 		super(context,attrs);
 	}
 
-
 	public GameView(Context context, AttributeSet attrs, int defStyleAttr)
 	{
 		super(context,attrs,defStyleAttr);
@@ -43,18 +43,16 @@ public class GameView extends View {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		//Here we get the height and weight
-		h = canvas.getHeight();
-		w = canvas.getWidth();
+		h = getHeight();
+		w = getWidth();
 		//update the size for the canvas to the game.
 		game.setSize(h,w);
 		Log.d("GAMEVIEW","h = "+h+", w = "+w);
-		//Making a new paint object
-		Paint paint = new Paint();
 		canvas.drawColor(Color.WHITE); //clear entire canvas to white color
 
 		//draw the pacman
 		canvas.drawBitmap(game.getPacBitmap(), game.getPacx(),game.getPacy(), paint);
-		//TODO loop through the list of goldcoins and draw them.
+		//TODO loop through the list of goldCoins and draw them.
 		super.onDraw(canvas);
 	}
 
