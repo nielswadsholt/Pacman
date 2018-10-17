@@ -1,5 +1,6 @@
 package org.example.pacman;
 
+import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
     //reference to the game class.
     Game game;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,26 +27,32 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         gameView =  findViewById(R.id.gameView);
-        TextView textView = findViewById(R.id.points);
+        gameView.setOnTouchListener(new OnSwipeTouchListener(this) {
+            @Override
+            public void onSwipeLeft() {
+                game.movePacman(-10, 0);
+            }
+            @Override
+            public void onSwipeRight() {
+                game.movePacman(10, 0);
+            }
+            @Override
+            public void onSwipeUp() {
+                game.movePacman(0, -10);
+            }
+            @Override
+            public void onSwipeDown() {
+                game.movePacman(0, 10);
+            }
+        });
 
+        TextView textView = findViewById(R.id.points);
 
         game = new Game(this,textView);
         game.setGameView(gameView);
         gameView.setGame(game);
 
         game.newGame();
-
-        Button buttonRight = findViewById(R.id.moveRight);
-        //listener of our pacman, when somebody clicks it
-        buttonRight.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                game.movePacmanRight(10);
-            }
-        });
-
-
     }
 
 

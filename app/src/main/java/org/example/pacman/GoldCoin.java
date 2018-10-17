@@ -6,5 +6,7 @@ package org.example.pacman;
  * has been taken (boolean)
  */
 
-public class GoldCoin {
+class GoldCoin {
+    int x, y;
+    boolean taken;
 }

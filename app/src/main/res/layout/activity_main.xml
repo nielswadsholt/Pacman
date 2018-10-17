@@ -5,12 +5,6 @@
     android:layout_height="match_parent"
     tools:context="org.example.pacman.MainActivity" >
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/move_right"
-        android:id="@+id/moveRight"/>
-
     <TextView
         android:id="@+id/points"
         android:textSize="24sp"

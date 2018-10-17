@@ -3,6 +3,7 @@ package org.example.pacman;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.widget.TextView;
 
 
@@ -58,14 +59,13 @@ public class Game {
         this.w = w;
     }
 
-    void movePacmanRight(int pixels)
+    void movePacman(int x, int y)
     {
-        //still within our boundaries?
-        if (pacx+pixels+pacBitmap.getWidth()<w) {
-            pacx = pacx + pixels;
-            doCollisionCheck();
-            gameView.invalidate();
-        }
+        pacx = (pacx + x + w) % w;
+        pacy = (pacy + y + h) % h;
+        Log.d("movePacman", "x: " + pacx + ", y: " + pacy);
+        doCollisionCheck();
+        gameView.invalidate();
     }
 
     //TODO check if the pacman touches a goldCoin

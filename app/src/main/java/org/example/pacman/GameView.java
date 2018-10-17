@@ -2,6 +2,7 @@ package org.example.pacman;
 
 import android.content.Context;
 
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -12,7 +13,8 @@ import android.view.View;
 public class GameView extends View {
 
 	Game game;
-    int h,w; //used for storing our height and width of the view
+    int h, w; //used for storing our height and width of the view
+    
     //Making a new paint object
     Paint paint = new Paint();
 
@@ -26,7 +28,6 @@ public class GameView extends View {
 	 */
 	public GameView(Context context) {
 		super(context);
-
 	}
 
 	public GameView(Context context, AttributeSet attrs) {
@@ -51,9 +52,11 @@ public class GameView extends View {
 		canvas.drawColor(Color.WHITE); //clear entire canvas to white color
 
 		//draw the pacman
-		canvas.drawBitmap(game.getPacBitmap(), game.getPacx(),game.getPacy(), paint);
+        Bitmap pacBitmap = game.getPacBitmap();
+        int x = game.getPacx() - pacBitmap.getWidth() / 2;
+        int y = game.getPacy() - pacBitmap.getHeight() / 2;
+		canvas.drawBitmap(pacBitmap, x, y, paint);
 		//TODO loop through the list of goldCoins and draw them.
 		super.onDraw(canvas);
 	}
-
 }
