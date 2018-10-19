@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,35 +29,45 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         gameView =  findViewById(R.id.gameView);
+
         gameView.setOnTouchListener(new OnSwipeTouchListener(this) {
+            // TODO: Set appropriate step size
+            int step = 25;
+
             @Override
             public void onSwipeLeft() {
-                game.movePacman(-10, 0);
+                game.movePacman(-step, 0);
             }
             @Override
             public void onSwipeRight() {
-                game.movePacman(10, 0);
+                game.movePacman(step, 0);
             }
             @Override
             public void onSwipeUp() {
-                game.movePacman(0, -10);
+                game.movePacman(0, -step);
             }
             @Override
             public void onSwipeDown() {
-                game.movePacman(0, 10);
+                game.movePacman(0, step);
             }
         });
 
         TextView textView = findViewById(R.id.points);
+        game = new Game(this, gameView, textView);
 
-        game = new Game(this,textView);
-        game.setGameView(gameView);
-        gameView.setGame(game);
+        // Get dimensions of gameView once created, then pass it to the game and finally pass THAT to the gameView
+        gameView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                gameView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                game.setSize(gameView.getWidth(), gameView.getHeight());
+                gameView.setGame(game);
+                game.newGame();
 
-        game.newGame();
+                Log.d("onCreate", "onCreate: gameView.getWidth() = " + gameView.getWidth());
+            }
+        });
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
