@@ -31,24 +31,21 @@ public class MainActivity extends AppCompatActivity {
         gameView =  findViewById(R.id.gameView);
 
         gameView.setOnTouchListener(new OnSwipeTouchListener(this) {
-            // TODO: Set appropriate step size
-            int step = 25;
-
             @Override
             public void onSwipeLeft() {
-                game.movePacman(-step, 0);
+                game.moveLeft();
             }
             @Override
             public void onSwipeRight() {
-                game.movePacman(step, 0);
+                game.moveRight();
             }
             @Override
             public void onSwipeUp() {
-                game.movePacman(0, -step);
+                game.moveUp();
             }
             @Override
             public void onSwipeDown() {
-                game.movePacman(0, step);
+                game.moveDown();
             }
         });
 
@@ -60,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onGlobalLayout() {
                 gameView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                game.setSize(gameView.getWidth(), gameView.getHeight());
+                game.setSize(gameView.getWidth());
                 gameView.setGame(game);
                 game.newGame();
 
