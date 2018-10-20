@@ -8,6 +8,10 @@ import android.util.Log;
 import android.widget.TextView;
 
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
@@ -31,13 +35,10 @@ public class Game {
     private int tileSize;
     private int pacSize;
     private int pacOffset;
-    private int[][]board;
+    private char[][]board;
 //    private int boardX, boardY;
 
     public int getHeight() { return h; }
-    int getWidth() { return w; }
-    int getPacX() { return pacX; }
-    int getPacY() { return pacY; }
     public int getPoints() { return points; }
     public ArrayList<GoldCoin> getCoins() { return coins; }
     Bitmap getPacBitmap() { return pacBitmap; }
@@ -61,18 +62,19 @@ public class Game {
         // initialize logic
         w = 28;
         h = 31;
-        board = new int[h][w];
-        board[0][0] = 2; // wall for testing
+
+        // load game map from text file
+        loadGameBoard("pac_map.txt");
     }
 
     //TODO initialize goldCoins also here
     void newGame()
     {
-        pacX = 14;
-        pacY = 24; //just some starting coordinates
+        pacX = 13;
+        pacY = 23; //just some starting coordinates
         Log.d("newGame", "tileSize = " + tileSize + ", pacOffset = " + pacOffset + ", pacSize = " + pacSize);
         Log.d("newGame", "pacX = " + pacX + ", pacY = " + pacY + ", widthOffset = " + widthOffset + ", heightOffset = " + heightOffset);
-        pacMatrix.setTranslate(pacX * tileSize - pacOffset + widthOffset, pacY * tileSize - pacOffset + heightOffset);
+        pacMatrix.setTranslate(pacXScaled() - pacOffset + widthOffset, pacYScaled() - pacOffset + heightOffset);
         //reset the points
         points = 0;
         pointsView.setText(context.getResources().getString(R.string.points, points));
@@ -95,8 +97,8 @@ public class Game {
 
     private void movePacman(int x, int y)
     {
-        int newPacX = (pacX + x + w - 1) % w + 1;
-        int newPacY = (pacY + y + h - 1) % h + 1;
+        int newPacX = (pacX + x + w ) % w;
+        int newPacY = (pacY + y + h) % h;
         Log.d("movePacman", "w = " + w + ", h = " + h + ", newPacX = " + newPacX + ", newPacY = " + newPacY + ", x = " + x + ", y = " + y);
 
         int degrees = 0;
@@ -104,13 +106,13 @@ public class Game {
         else if (y > 0) degrees = 90;
         else if (y < 0) degrees = -90;
 
-        Log.d("movePacman", "board[pacY-1][pacX-1] = " + board[newPacY-1][newPacX-1]);
+        Log.d("movePacman", "board[pacY-1][pacX-1] = " + board[newPacY][newPacX]);
 
-        if (board[newPacY-1][newPacX-1] != 2) {
+        if (board[newPacY][newPacX] != '#') {
             pacX = newPacX;
             pacY = newPacY;
             pacMatrix.setRotate(degrees, pacBitmap.getWidth() / 2, pacBitmap.getHeight() / 2);
-            pacMatrix.postTranslate(pacX * tileSize - pacOffset + widthOffset, pacY * tileSize - pacOffset + heightOffset);
+            pacMatrix.postTranslate(pacXScaled() - pacOffset + widthOffset, pacYScaled() - pacOffset + heightOffset);
         }
         else {
             Log.d("wallhit", "Wall hit prevented!");
@@ -144,5 +146,44 @@ public class Game {
     private void doCollisionCheck()
     {
 
+    }
+
+    int pacXScaled() {
+        return (pacX + 1) * tileSize;
+    }
+
+    int pacYScaled() {
+        return (pacY + 1) * tileSize;
+    }
+
+    private void loadGameBoard(String textFile) {
+        // temporary hack because line count in txt is not known before they are read:
+        ArrayList<char[]> tempBoard = new ArrayList<>();
+        int width = 0;
+
+        try {
+            InputStream inputStream = context.getAssets().open(textFile);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            int lineCount = 0;
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                char[] lineArray = line.toCharArray();
+                width = lineArray.length;
+                lineCount++;
+                tempBoard.add(lineArray);
+                Log.d("loadGameBoard", "lineArray[0] = " + lineArray[0] + " + lineArray[lineArray.length-1]" + lineArray[lineArray.length-1] + "line.length() = " + line.length() + "lineArray.length = " + lineArray.length);
+            }
+
+            Log.d("loadGameBoard", "lineCount = " + lineCount + ", width = " + width);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        board = new char[tempBoard.size()][width];
+
+        for (int i = 0; i < tempBoard.size(); i++) {
+            board[i] = tempBoard.get(i);
+        }
     }
 }

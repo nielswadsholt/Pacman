@@ -56,10 +56,10 @@ public class GameView extends View {
                 h / 2 - boardBitmap.getHeight() / 2,
                 paint);
         path.addRect(
-                game.getPacX() * tileSize + tileSize / 2 + game.getWidthOffset(),
-                game.getPacY() * tileSize + tileSize / 2 + game.getHeightOffset(),
-                game.getPacX() * tileSize + tileSize / 2 + game.getWidthOffset() + 1,
-                game.getPacY() * tileSize + tileSize / 2 + game.getHeightOffset() + 1,
+                game.pacXScaled() + tileSize / 2 + game.getWidthOffset(),
+                game.pacYScaled() + tileSize / 2 + game.getHeightOffset(),
+                game.pacXScaled() + tileSize / 2 + game.getWidthOffset() + 1,
+                game.pacYScaled() + tileSize / 2 + game.getHeightOffset() + 1,
                 Path.Direction.CCW);
         canvas.drawPath(path, paint);
 
