@@ -6,15 +6,15 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 public class GameView extends View {
 
     Game game;
     Paint paint = new Paint();
-    Path path = new Path();
+    Paint dotPaint = new Paint();
 
     public void setGame(Game game)
     {
@@ -35,11 +35,12 @@ public class GameView extends View {
     }
 
     private void paintSetup() {
-        paint.setColor(Color.BLACK);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeJoin(Paint.Join.ROUND);
-        paint.setStrokeCap(Paint.Cap.ROUND);
-        paint.setStrokeWidth(game.getTileSize());
+
+        dotPaint.setColor(getResources().getColor(R.color.colorDot));
+        dotPaint.setStyle(Paint.Style.STROKE);
+        dotPaint.setStrokeJoin(Paint.Join.ROUND);
+        dotPaint.setStrokeCap(Paint.Cap.ROUND);
+        dotPaint.setStrokeWidth(game.getTileSize() / 6);
     }
 
     @Override
@@ -55,19 +56,36 @@ public class GameView extends View {
                 w / 2 - boardBitmap.getWidth() / 2,
                 h / 2 - boardBitmap.getHeight() / 2,
                 paint);
-        path.addRect(
-                game.pacXScaled() + tileSize / 2 + game.getWidthOffset(),
-                game.pacYScaled() + tileSize / 2 + game.getHeightOffset(),
-                game.pacXScaled() + tileSize / 2 + game.getWidthOffset() + 1,
-                game.pacYScaled() + tileSize / 2 + game.getHeightOffset() + 1,
-                Path.Direction.CCW);
-        canvas.drawPath(path, paint);
+
+        // draw dots and check for win
+        char[][] board = game.getBoard();
+        boolean won = true;
+
+        for (int i = 0; i < board.length; i++){
+            for (int j = 0; j < board[0].length; j++) {
+                if (board[i][j] == '*') {
+                    won = false;
+
+                    int x = game.scaleToMap(j);
+                    int y = game.scaleToMap(i);
+                    canvas.drawRect(
+                            x - 1 + tileSize / 2 + game.getWidthOffset(),
+                            y - 1 + tileSize / 2 + game.getHeightOffset(),
+                            x + 1 + tileSize / 2 + game.getWidthOffset(),
+                            y + 1 + tileSize / 2 + game.getHeightOffset(),
+                            dotPaint);
+                }
+            }
+        }
+
+        if (won) {
+            Log.d("GameWon", "You win!");
+        }
 
         //draw the pac-man
         Bitmap pacBitmap = game.getPacBitmap();
         canvas.drawBitmap(pacBitmap, game.getPacMatrix(), paint);
 
-        //TODO loop through the list of goldCoins and draw them.
         super.onDraw(canvas);
     }
 }

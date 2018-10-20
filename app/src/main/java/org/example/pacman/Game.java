@@ -36,7 +36,6 @@ public class Game {
     private int pacSize;
     private int pacOffset;
     private char[][]board;
-//    private int boardX, boardY;
 
     public int getHeight() { return h; }
     public int getPoints() { return points; }
@@ -47,6 +46,7 @@ public class Game {
     int getWidthOffset() { return widthOffset; }
     int getHeightOffset() { return heightOffset; }
     int getTileSize() { return tileSize; }
+    char[][] getBoard() { return board; }
 
     Game(Context context, GameView gameView, TextView pointsView)
     {
@@ -67,14 +67,14 @@ public class Game {
         loadGameBoard("pac_map.txt");
     }
 
-    //TODO initialize goldCoins also here
     void newGame()
     {
         pacX = 13;
         pacY = 23; //just some starting coordinates
         Log.d("newGame", "tileSize = " + tileSize + ", pacOffset = " + pacOffset + ", pacSize = " + pacSize);
         Log.d("newGame", "pacX = " + pacX + ", pacY = " + pacY + ", widthOffset = " + widthOffset + ", heightOffset = " + heightOffset);
-        pacMatrix.setTranslate(pacXScaled() - pacOffset + widthOffset, pacYScaled() - pacOffset + heightOffset);
+        pacMatrix.setTranslate(scaleToMap(pacX) - pacOffset + widthOffset, scaleToMap(pacY) - pacOffset + heightOffset);
+
         //reset the points
         points = 0;
         pointsView.setText(context.getResources().getString(R.string.points, points));
@@ -108,17 +108,15 @@ public class Game {
 
         Log.d("movePacman", "board[pacY-1][pacX-1] = " + board[newPacY][newPacX]);
 
+        // make move if new tile is not a wall
         if (board[newPacY][newPacX] != '#') {
             pacX = newPacX;
             pacY = newPacY;
             pacMatrix.setRotate(degrees, pacBitmap.getWidth() / 2, pacBitmap.getHeight() / 2);
-            pacMatrix.postTranslate(pacXScaled() - pacOffset + widthOffset, pacYScaled() - pacOffset + heightOffset);
-        }
-        else {
-            Log.d("wallhit", "Wall hit prevented!");
+            pacMatrix.postTranslate(scaleToMap(pacX) - pacOffset + widthOffset, scaleToMap(pacY) - pacOffset + heightOffset);
         }
 
-        doCollisionCheck();
+        eatDot();
         gameView.invalidate();
     }
 
@@ -138,22 +136,18 @@ public class Game {
         movePacman(0, 1);
     }
 
-    //TODO check if the pacman touches a goldCoin
-    //and if yes, then update the necessary data
-    //for the goldCoins and the points
-    //so you need to go through the arrayList of goldCoins and
-    //check each of them for a collision with the pacman
-    private void doCollisionCheck()
+    private void eatDot()
     {
-
+        // eat dot and update score
+        if (board[pacY][pacX] == '*') {
+            points += 10;
+            board[pacY][pacX] = ' ';
+            pointsView.setText(context.getResources().getString(R.string.points, points));
+        }
     }
 
-    int pacXScaled() {
-        return (pacX + 1) * tileSize;
-    }
-
-    int pacYScaled() {
-        return (pacY + 1) * tileSize;
+    int scaleToMap(int coordinate){
+        return (coordinate + 1) * tileSize;
     }
 
     private void loadGameBoard(String textFile) {
