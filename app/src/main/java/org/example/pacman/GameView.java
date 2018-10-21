@@ -2,10 +2,12 @@ package org.example.pacman;
 
 import android.content.Context;
 
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -37,10 +39,10 @@ public class GameView extends View {
     private void paintSetup() {
 
         dotPaint.setColor(getResources().getColor(R.color.colorDot));
-        dotPaint.setStyle(Paint.Style.STROKE);
+        dotPaint.setStyle(Paint.Style.FILL);
         dotPaint.setStrokeJoin(Paint.Join.ROUND);
         dotPaint.setStrokeCap(Paint.Cap.ROUND);
-        dotPaint.setStrokeWidth(game.getTileSize() / 6);
+        dotPaint.setStrokeWidth(game.getTileSize() / 2);
     }
 
     @Override
@@ -69,16 +71,17 @@ public class GameView extends View {
                     int x = game.scaleToMap(j);
                     int y = game.scaleToMap(i);
                     canvas.drawRect(
-                            x - 1 + tileSize / 2 + game.getWidthOffset(),
-                            y - 1 + tileSize / 2 + game.getHeightOffset(),
-                            x + 1 + tileSize / 2 + game.getWidthOffset(),
-                            y + 1 + tileSize / 2 + game.getHeightOffset(),
+                            x - 3 + tileSize / 2 + game.getWidthOffset(),
+                            y - 3 + tileSize / 2 + game.getHeightOffset(),
+                            x + 3 + tileSize / 2 + game.getWidthOffset(),
+                            y + 3 + tileSize / 2 + game.getHeightOffset(),
                             dotPaint);
                 }
             }
         }
 
         if (won) {
+            DeclareResult(getResources().getString(R.string.youwin));
             Log.d("GameWon", "You win!");
         }
 
@@ -87,5 +90,24 @@ public class GameView extends View {
         canvas.drawBitmap(pacBitmap, game.getPacMatrix(), paint);
 
         super.onDraw(canvas);
+    }
+
+    public void DeclareResult(CharSequence message) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
+        alertDialogBuilder.setMessage(message);
+        alertDialogBuilder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                game.newGame();
+            }
+        });
+        alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                game.newGame();
+            }
+        });
+        AlertDialog alertDialog = alertDialogBuilder.create();
+        alertDialog.show();
     }
 }

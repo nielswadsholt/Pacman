@@ -7,9 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewTreeObserver;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onGlobalLayout() {
                 gameView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-                game.setSize(gameView.getWidth());
                 gameView.setGame(game);
                 game.newGame();
 
@@ -83,9 +80,10 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this,"settings clicked",Toast.LENGTH_LONG).show();
             return true;
         } else if (id == R.id.action_newGame) {
-            Toast.makeText(this,"New Game clicked",Toast.LENGTH_LONG).show();
+            game.newGame();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
+
 }

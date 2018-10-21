@@ -51,24 +51,17 @@ public class Game {
     Game(Context context, GameView gameView, TextView pointsView)
     {
         this.context = context;
-
-        // initialize graphics
         this.gameView = gameView;
         this.pointsView = pointsView;
         boardBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.game_board);
         pacBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.pacman_right);
         pacMatrix = new Matrix();
-
-        // initialize logic
-        w = 28;
-        h = 31;
-
-        // load game map from text file
-        loadGameBoard("pac_map.txt");
     }
 
     void newGame()
     {
+        loadGameBoard("pac_map.txt");
+        setSize(gameView.getWidth());
         pacX = 13;
         pacY = 23; //just some starting coordinates
         Log.d("newGame", "tileSize = " + tileSize + ", pacOffset = " + pacOffset + ", pacSize = " + pacSize);
@@ -81,7 +74,7 @@ public class Game {
         gameView.invalidate(); //redraw screen
     }
 
-    void setSize(int viewWidth)
+    private void setSize(int viewWidth)
     {
         tileSize = viewWidth / this.w;
         widthOffset = (gameView.getWidth() - this.w * tileSize) / 2 - tileSize;
@@ -174,9 +167,11 @@ public class Game {
             e.printStackTrace();
         }
 
-        board = new char[tempBoard.size()][width];
+        h = tempBoard.size();
+        w = width;
+        board = new char[h][w];
 
-        for (int i = 0; i < tempBoard.size(); i++) {
+        for (int i = 0; i < h; i++) {
             board[i] = tempBoard.get(i);
         }
     }
