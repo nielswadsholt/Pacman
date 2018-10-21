@@ -1,4 +1,4 @@
-package org.example.pacman;
+package ai.brothersinarms.pacman;
 
 /**
  * This class should contain information about a single GoldCoin.

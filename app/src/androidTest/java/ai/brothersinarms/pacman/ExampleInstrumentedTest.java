@@ -1,4 +1,4 @@
-package org.example.pacman;
+package ai.brothersinarms.pacman;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("org.example.pacman", appContext.getPackageName());
+        assertEquals("ai.brothersinarms.pacman", appContext.getPackageName());
     }
 }

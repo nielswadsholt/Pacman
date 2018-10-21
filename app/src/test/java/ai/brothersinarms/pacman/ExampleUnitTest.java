@@ -1,4 +1,4 @@
-package org.example.pacman;
+package ai.brothersinarms.pacman;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package org.example.pacman;
+package ai.brothersinarms.pacman;
 
 import android.content.Context;
 
@@ -85,9 +85,12 @@ public class GameView extends View {
             Log.d("GameWon", "You win!");
         }
 
-        //draw the pac-man
+        // draw the pac-man
         Bitmap pacBitmap = game.getPacBitmap();
         canvas.drawBitmap(pacBitmap, game.getPacMatrix(), paint);
+
+        // draw enemies
+        canvas.drawBitmap(game.getBlinkyBitmap(), game.getBlinkyMatrix(), paint);
 
         super.onDraw(canvas);
     }

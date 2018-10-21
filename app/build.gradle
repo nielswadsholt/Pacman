@@ -4,7 +4,7 @@ android {
     compileSdkVersion 27
     buildToolsVersion '28.0.3'
     defaultConfig {
-        applicationId "org.example.pacman"
+        applicationId "ai.brothersinarms.pacman"
         minSdkVersion 19
         targetSdkVersion 27
         versionCode 1

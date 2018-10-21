@@ -1,4 +1,4 @@
-package org.example.pacman;
+package ai.brothersinarms.pacman;
 
 import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;

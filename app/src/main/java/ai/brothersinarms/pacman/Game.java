@@ -1,4 +1,4 @@
-package org.example.pacman;
+package ai.brothersinarms.pacman;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -26,6 +26,8 @@ public class Game {
     private Bitmap boardBitmap;
     private Bitmap pacBitmap;
     private Matrix pacMatrix;
+    private Bitmap blinkyBitmap;
+    private Matrix blinkyMatrix;
     private int pacX, pacY;
     //the list of goldCoins - initially empty
     private ArrayList<GoldCoin> coins = new ArrayList<>();
@@ -43,6 +45,8 @@ public class Game {
     Bitmap getPacBitmap() { return pacBitmap; }
     Bitmap getBoardBitmap(){ return boardBitmap; }
     Matrix getPacMatrix() { return pacMatrix; }
+    Bitmap getBlinkyBitmap() { return blinkyBitmap; }
+    Matrix getBlinkyMatrix() { return blinkyMatrix; }
     int getWidthOffset() { return widthOffset; }
     int getHeightOffset() { return heightOffset; }
     int getTileSize() { return tileSize; }
@@ -55,7 +59,9 @@ public class Game {
         this.pointsView = pointsView;
         boardBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.game_board);
         pacBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.pacman_right);
+        blinkyBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.blinky);
         pacMatrix = new Matrix();
+        blinkyMatrix = new Matrix();
     }
 
     void newGame()
@@ -67,6 +73,7 @@ public class Game {
         Log.d("newGame", "tileSize = " + tileSize + ", pacOffset = " + pacOffset + ", pacSize = " + pacSize);
         Log.d("newGame", "pacX = " + pacX + ", pacY = " + pacY + ", widthOffset = " + widthOffset + ", heightOffset = " + heightOffset);
         pacMatrix.setTranslate(scaleToMap(pacX) - pacOffset + widthOffset, scaleToMap(pacY) - pacOffset + heightOffset);
+        blinkyMatrix.setTranslate(scaleToMap(14) - pacOffset + widthOffset, scaleToMap(11) - pacOffset + heightOffset);
 
         //reset the points
         points = 0;
@@ -85,6 +92,7 @@ public class Game {
         Log.d("gameSize", "board: width = " + this.w * tileSize + ", height = " + this.h * tileSize);
         Log.d("gameSize", "widthOffset = " + widthOffset + ", heightOffset = " + heightOffset);
         pacBitmap = Bitmap.createScaledBitmap(pacBitmap, pacSize, pacSize, true);
+        blinkyBitmap = Bitmap.createScaledBitmap(blinkyBitmap, pacSize, pacSize, true);
         Log.d("gameSize", "pacman: " + pacSize);
     }
 
@@ -110,6 +118,9 @@ public class Game {
         }
 
         eatDot();
+
+        if (isEaten()) gameView.DeclareResult(gameView.getResources().getString(R.string.gameover));
+
         gameView.invalidate();
     }
 
@@ -137,6 +148,20 @@ public class Game {
             board[pacY][pacX] = ' ';
             pointsView.setText(context.getResources().getString(R.string.points, points));
         }
+    }
+
+    private boolean isEaten() {
+        float[] pacValues = new float[9];
+        pacMatrix.getValues(pacValues);
+        float[] blinkyValues = new float[9];
+        blinkyMatrix.getValues(blinkyValues);
+        Log.d("matrix", "pacValues[Matrix.MTRANS_X] = " + pacValues[Matrix.MTRANS_X]
+                + ", blinkyValues[Matrix.MTRANS_X] = " + blinkyValues[Matrix.MTRANS_X]);
+        Log.d("matrix", "pacValues[Matrix.MTRANS_Y] = " + pacValues[Matrix.MTRANS_Y]
+                + ", blinkyValues[Matrix.MTRANS_Y] = " + blinkyValues[Matrix.MTRANS_Y]);
+
+        return pacValues[Matrix.MTRANS_X] == blinkyValues[Matrix.MTRANS_X]
+                && pacValues[Matrix.MTRANS_Y] == blinkyValues[Matrix.MTRANS_Y];
     }
 
     int scaleToMap(int coordinate){
