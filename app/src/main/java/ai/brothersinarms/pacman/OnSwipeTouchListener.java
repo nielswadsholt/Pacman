@@ -15,10 +15,12 @@ import android.view.View.OnTouchListener;
  */
 public class OnSwipeTouchListener implements OnTouchListener {
 
+    private Context context;
     private final GestureDetector gestureDetector;
 
-    OnSwipeTouchListener (Context ctx){
-        gestureDetector = new GestureDetector(ctx, new GestureListener());
+    OnSwipeTouchListener (Context context){
+        this.context = context;
+        gestureDetector = new GestureDetector(context, new GestureListener());
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -80,6 +82,7 @@ public class OnSwipeTouchListener implements OnTouchListener {
         public boolean onSingleTapUp(MotionEvent e) {
             // TODO: Pause/resume game
             Log.d("OnSwipeTouchListener", "GAME PAUSED/RESUMED!");
+            ((MainActivity)context).toggleRunning();
             return super.onSingleTapUp(e);
         }
     }

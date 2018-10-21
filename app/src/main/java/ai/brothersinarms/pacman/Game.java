@@ -28,7 +28,8 @@ public class Game {
     private Matrix pacMatrix;
     private Bitmap blinkyBitmap;
     private Matrix blinkyMatrix;
-    private int pacX, pacY;
+    private int pacX, pacY; // current position of pacman
+    private int dirX, dirY; // current direction of pacman
     //the list of goldCoins - initially empty
     private ArrayList<GoldCoin> coins = new ArrayList<>();
     private GameView gameView;
@@ -96,16 +97,16 @@ public class Game {
         Log.d("gameSize", "pacman: " + pacSize);
     }
 
-    private void movePacman(int x, int y)
+    void movePacman()
     {
-        int newPacX = (pacX + x + w ) % w;
-        int newPacY = (pacY + y + h) % h;
-        Log.d("movePacman", "w = " + w + ", h = " + h + ", newPacX = " + newPacX + ", newPacY = " + newPacY + ", x = " + x + ", y = " + y);
+        int newPacX = (pacX + dirX + w ) % w;
+        int newPacY = (pacY + dirY + h) % h;
+        Log.d("movePacman", "w = " + w + ", h = " + h + ", newPacX = " + newPacX + ", newPacY = " + newPacY + ", dirX = " + dirX + ", dirY = " + dirY);
 
         int degrees = 0;
-        if (x < 0) degrees = 180;
-        else if (y > 0) degrees = 90;
-        else if (y < 0) degrees = -90;
+        if (dirX < 0) degrees = 180;
+        else if (dirY > 0) degrees = 90;
+        else if (dirY < 0) degrees = -90;
 
         Log.d("movePacman", "board[pacY-1][pacX-1] = " + board[newPacY][newPacX]);
 
@@ -124,20 +125,25 @@ public class Game {
         gameView.invalidate();
     }
 
+    private void changeDirection(int x, int y) {
+        dirX = x;
+        dirY = y;
+    }
+
     void moveLeft() {
-        movePacman(-1, 0);
+        changeDirection(-1, 0);
     }
 
     void moveRight() {
-        movePacman(1, 0);
+        changeDirection(1, 0);
     }
 
     void moveUp() {
-        movePacman(0, -1);
+        changeDirection(0, -1);
     }
 
     void moveDown() {
-        movePacman(0, 1);
+        changeDirection(0, 1);
     }
 
     private void eatDot()

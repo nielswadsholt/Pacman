@@ -6,4 +6,5 @@
     <string name="newgame">New Game</string>
     <string name="youwin">You win!</string>
     <string name="gameover">Game Over</string>
+    <string name="time">Time: %1$d</string>
 </resources>

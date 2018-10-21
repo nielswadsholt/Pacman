@@ -11,12 +11,19 @@ import android.view.ViewTreeObserver;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 public class MainActivity extends AppCompatActivity {
-    //reference to the main view
     GameView gameView;
-    //reference to the game class.
+    TextView timerView;
     Game game;
+    private Timer pacTimer;
+    private int counter = 0;
+    private boolean running = false;
+    private int pacmove = 3; // How many pixel the pac-man moves per update
+    private int period = 200; // Number of milliseconds between each update
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -31,23 +38,28 @@ public class MainActivity extends AppCompatActivity {
         gameView.setOnTouchListener(new OnSwipeTouchListener(this) {
             @Override
             public void onSwipeLeft() {
+                running = true;
                 game.moveLeft();
             }
             @Override
             public void onSwipeRight() {
+                running = true;
                 game.moveRight();
             }
             @Override
             public void onSwipeUp() {
+                running = true;
                 game.moveUp();
             }
             @Override
             public void onSwipeDown() {
+                running = true;
                 game.moveDown();
             }
         });
 
         TextView textView = findViewById(R.id.points);
+        timerView = findViewById(R.id.clock);
         game = new Game(this, gameView, textView);
 
         // Get dimensions of gameView once created, then pass it to the game and finally pass THAT to the gameView
@@ -59,9 +71,57 @@ public class MainActivity extends AppCompatActivity {
                 game.newGame();
 
                 Log.d("onCreate", "onCreate: gameView.getWidth() = " + gameView.getWidth());
+
+                // Set up timer
+                pacTimer = new Timer();
+                running = true; //should the game be running?
+                pacTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        TimerMethod();
+                    }
+
+                }, 0, period);
             }
         });
     }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //just to make sure if the app is killed, that we stop the timer.
+        pacTimer.cancel();
+    }
+
+    private void TimerMethod()
+    {
+        //This method is called directly by the timer
+        //and runs in the same thread as the timer.
+
+        //We call the method that will work with the UI
+        //through the runOnUiThread method.
+        this.runOnUiThread(Timer_Tick);
+
+    }
+
+    private Runnable Timer_Tick = new Runnable() {
+        public void run() {
+
+            //This method runs in the same thread as the UI.
+            // so we can draw
+            if (running)
+            {
+                counter++;
+                //update the counter - notice this is NOT seconds in this example
+                //you need TWO counters - one for the time and one for the pacman
+                timerView.setText(getResources().getString(R.string.time, counter));
+                game.movePacman(); //move the pacman - you
+                //should call a method on your game class to move
+                //the pacman instead of this
+            }
+        }
+    };
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -84,6 +144,10 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    void toggleRunning() {
+        running = !running;
     }
 
 }
