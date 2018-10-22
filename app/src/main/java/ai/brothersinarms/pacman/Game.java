@@ -39,6 +39,7 @@ public class Game {
     private int pacSize;
     private int pacOffset;
     private char[][]board;
+    private int dotCount;
 
     public int getHeight() { return h; }
     public int getPoints() { return points; }
@@ -48,6 +49,15 @@ public class Game {
     Matrix getPacMatrix() { return pacMatrix; }
     Bitmap getBlinkyBitmap() { return blinkyBitmap; }
     Matrix getBlinkyMatrix() { return blinkyMatrix; }
+
+    int getPacX() {
+        return pacX;
+    }
+
+    int getPacY() {
+        return pacY;
+    }
+
     int getWidthOffset() { return widthOffset; }
     int getHeightOffset() { return heightOffset; }
     int getTileSize() { return tileSize; }
@@ -58,7 +68,7 @@ public class Game {
         this.context = context;
         this.gameView = gameView;
         this.pointsView = pointsView;
-        boardBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.game_board);
+        boardBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.game_board_dots);
         pacBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.pacman_right);
         blinkyBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.blinky);
         pacMatrix = new Matrix();
@@ -67,7 +77,7 @@ public class Game {
 
     void newGame()
     {
-        loadGameBoard("pac_map.txt");
+        loadGameBoard("pac_map_test.txt");
         setSize(gameView.getWidth());
         pacX = 13;
         pacY = 23; //just some starting coordinates
@@ -79,7 +89,50 @@ public class Game {
         //reset the points
         points = 0;
         pointsView.setText(context.getResources().getString(R.string.points, points));
-        gameView.invalidate(); //redraw screen
+
+        //redraw screen
+        gameView.invalidate();
+    }
+
+    private void loadGameBoard(String textFile) {
+        // temporary ArrayList used here because line count in txt is not known beforehand
+        ArrayList<char[]> tempBoard = new ArrayList<>();
+        int width = 0;
+        dotCount = 0;
+
+        try {
+            InputStream inputStream = context.getAssets().open(textFile);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            int lineCount = 0;
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                char[] lineArray = line.toCharArray();
+                width = Math.max(width, lineArray.length); // in case lines have different lengths
+                lineCount++;
+                tempBoard.add(lineArray);
+                Log.d("loadGameBoard", "lineArray[0] = " + lineArray[0] + " + lineArray[lineArray.length-1]" + lineArray[lineArray.length-1] + "line.length() = " + line.length() + "lineArray.length = " + lineArray.length);
+
+                // add dots to count
+                for (char ch : lineArray) {
+                    if (ch == '*') {
+                        dotCount++;
+                    }
+                }
+            }
+
+            Log.d("loadGameBoard", "lineCount = " + lineCount + ", width = " + width);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        h = tempBoard.size();
+        w = width;
+        board = new char[h][w];
+
+        for (int i = 0; i < h; i++) {
+            board[i] = tempBoard.get(i);
+        }
     }
 
     private void setSize(int viewWidth)
@@ -120,7 +173,12 @@ public class Game {
 
         eatDot();
 
-        if (isEaten()) gameView.DeclareResult(gameView.getResources().getString(R.string.gameover));
+        // game over or won?
+        if (isEaten()) {
+            gameView.endGame(gameView.getResources().getString(R.string.gameover));
+        } else if (dotCount < 1) {
+            gameView.endGame(gameView.getResources().getString(R.string.youwin));
+        }
 
         gameView.invalidate();
     }
@@ -150,6 +208,7 @@ public class Game {
     {
         // eat dot and update score
         if (board[pacY][pacX] == '*') {
+            dotCount--;
             points += 10;
             board[pacY][pacX] = ' ';
             pointsView.setText(context.getResources().getString(R.string.points, points));
@@ -172,38 +231,5 @@ public class Game {
 
     int scaleToMap(int coordinate){
         return (coordinate + 1) * tileSize;
-    }
-
-    private void loadGameBoard(String textFile) {
-        // temporary hack because line count in txt is not known before they are read:
-        ArrayList<char[]> tempBoard = new ArrayList<>();
-        int width = 0;
-
-        try {
-            InputStream inputStream = context.getAssets().open(textFile);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            int lineCount = 0;
-
-            String line;
-            while ((line = reader.readLine()) != null) {
-                char[] lineArray = line.toCharArray();
-                width = lineArray.length;
-                lineCount++;
-                tempBoard.add(lineArray);
-                Log.d("loadGameBoard", "lineArray[0] = " + lineArray[0] + " + lineArray[lineArray.length-1]" + lineArray[lineArray.length-1] + "line.length() = " + line.length() + "lineArray.length = " + lineArray.length);
-            }
-
-            Log.d("loadGameBoard", "lineCount = " + lineCount + ", width = " + width);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        h = tempBoard.size();
-        w = width;
-        board = new char[h][w];
-
-        for (int i = 0; i < h; i++) {
-            board[i] = tempBoard.get(i);
-        }
     }
 }

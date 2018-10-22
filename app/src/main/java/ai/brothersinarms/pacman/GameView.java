@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -14,9 +15,10 @@ import android.view.View;
 
 public class GameView extends View {
 
+    Context context;
     Game game;
     Paint paint = new Paint();
-    Paint dotPaint = new Paint();
+    Path path = new Path();
 
     public void setGame(Game game)
     {
@@ -30,6 +32,7 @@ public class GameView extends View {
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        this.context = context;
     }
 
     public GameView(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -37,12 +40,11 @@ public class GameView extends View {
     }
 
     private void paintSetup() {
-
-        dotPaint.setColor(getResources().getColor(R.color.colorDot));
-        dotPaint.setStyle(Paint.Style.FILL);
-        dotPaint.setStrokeJoin(Paint.Join.ROUND);
-        dotPaint.setStrokeCap(Paint.Cap.ROUND);
-        dotPaint.setStrokeWidth(game.getTileSize() / 2);
+        paint.setColor(Color.BLACK);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setStrokeCap(Paint.Cap.ROUND);
+        paint.setStrokeWidth(game.getTileSize());
     }
 
     @Override
@@ -59,31 +61,13 @@ public class GameView extends View {
                 h / 2 - boardBitmap.getHeight() / 2,
                 paint);
 
-        // draw dots and check for win
-        char[][] board = game.getBoard();
-        boolean won = true;
-
-        for (int i = 0; i < board.length; i++){
-            for (int j = 0; j < board[0].length; j++) {
-                if (board[i][j] == '*') {
-                    won = false;
-
-                    int x = game.scaleToMap(j);
-                    int y = game.scaleToMap(i);
-                    canvas.drawRect(
-                            x - 3 + tileSize / 2 + game.getWidthOffset(),
-                            y - 3 + tileSize / 2 + game.getHeightOffset(),
-                            x + 3 + tileSize / 2 + game.getWidthOffset(),
-                            y + 3 + tileSize / 2 + game.getHeightOffset(),
-                            dotPaint);
-                }
-            }
-        }
-
-        if (won) {
-            DeclareResult(getResources().getString(R.string.youwin));
-            Log.d("GameWon", "You win!");
-        }
+        path.addRect(
+                game.scaleToMap(game.getPacX()) + game.getWidthOffset(),
+                game.scaleToMap(game.getPacY()) + game.getHeightOffset(),
+                game.scaleToMap(game.getPacX()) + tileSize + game.getWidthOffset() + 1,
+                game.scaleToMap(game.getPacY()) + tileSize + game.getHeightOffset() + 1,
+                Path.Direction.CCW);
+        canvas.drawPath(path, paint);
 
         // draw the pac-man
         Bitmap pacBitmap = game.getPacBitmap();
@@ -95,22 +79,30 @@ public class GameView extends View {
         super.onDraw(canvas);
     }
 
-    public void DeclareResult(CharSequence message) {
+    void declareResult(CharSequence message) {
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getContext());
         alertDialogBuilder.setMessage(message);
         alertDialogBuilder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                ((MainActivity)context).resetTime();
+                path.reset();
                 game.newGame();
             }
         });
         alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
+                ((MainActivity)context).resetTime();
+                path.reset();
                 game.newGame();
             }
         });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
+    }
+
+    public void endGame(CharSequence message) {
+        declareResult(message);
     }
 }

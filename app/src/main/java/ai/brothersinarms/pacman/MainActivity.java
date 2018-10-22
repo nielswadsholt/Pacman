@@ -20,7 +20,8 @@ public class MainActivity extends AppCompatActivity {
     TextView timerView;
     Game game;
     private Timer pacTimer;
-    private int counter = 0;
+    private int pacCounter;
+    private int timeCounter;
     private boolean running = false;
     private int pacmove = 3; // How many pixel the pac-man moves per update
     private int period = 200; // Number of milliseconds between each update
@@ -74,7 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
                 // Set up timer
                 pacTimer = new Timer();
-                running = true; //should the game be running?
                 pacTimer.schedule(new TimerTask() {
                     @Override
                     public void run() {
@@ -82,6 +82,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                 }, 0, period);
+                resetTime();
             }
         });
     }
@@ -112,13 +113,13 @@ public class MainActivity extends AppCompatActivity {
             // so we can draw
             if (running)
             {
-                counter++;
+                pacCounter++;
+                timeCounter+= 2;
                 //update the counter - notice this is NOT seconds in this example
                 //you need TWO counters - one for the time and one for the pacman
-                timerView.setText(getResources().getString(R.string.time, counter));
-                game.movePacman(); //move the pacman - you
-                //should call a method on your game class to move
-                //the pacman instead of this
+                timerView.setText(getResources().getString(R.string.time, pacCounter));
+                game.movePacman(); //move the pacman
+
             }
         }
     };
@@ -140,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(this,"settings clicked",Toast.LENGTH_LONG).show();
             return true;
         } else if (id == R.id.action_newGame) {
+            resetTime();
             game.newGame();
             return true;
         }
@@ -150,4 +152,10 @@ public class MainActivity extends AppCompatActivity {
         running = !running;
     }
 
+    void resetTime() {
+        running = false;
+        pacCounter = 0;
+        timeCounter = 60;
+        timerView.setText(getResources().getString(R.string.time, pacCounter));
+    }
 }
