@@ -16,7 +16,6 @@ import java.util.TimerTask;
 
 
 public class MainActivity extends AppCompatActivity {
-    // DUMMY CHANGE TO ALLOW NEW COMMIT/PUSH TO GITHUB BECAUSE THE LAST ONE DIDN'T SHOW UP
     GameView gameView;
     TextView timerView;
     Game game;
