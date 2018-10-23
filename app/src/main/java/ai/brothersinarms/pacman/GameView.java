@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.drawable.Drawable;
 import android.support.v7.app.AlertDialog;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -85,26 +86,38 @@ public class GameView extends View {
         alertDialogBuilder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                ((MainActivity)context).resetTime();
-                path.reset();
-                game.newGame();
+                restart();
             }
         });
         alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                ((MainActivity)context).resetTime();
-                path.reset();
-                game.newGame();
+                restart();
             }
         });
         AlertDialog alertDialog = alertDialogBuilder.create();
         alertDialog.show();
     }
 
-    public void endGame(CharSequence message) {
+    void endGame(CharSequence message) {
         Log.d("endGame", "endGame called");
         ((MainActivity)context).stopRunning();
         declareResult(message);
+    }
+
+    void restart() {
+        ((MainActivity)context).resetTime();
+        path.reset();
+        game.newGame();
+    }
+
+    void addPauseOverlay() {
+        Drawable overlay = getResources().getDrawable(R.drawable.game_pause);
+        overlay.setBounds(0, 0, getMeasuredWidth(), getMeasuredHeight());
+        getOverlay().add(overlay);
+    }
+
+    void removePauseOverlay() {
+        getOverlay().clear();
     }
 }

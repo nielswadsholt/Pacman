@@ -80,9 +80,7 @@ public class OnSwipeTouchListener implements OnTouchListener {
 
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
-            // TODO: Pause/resume game
-            Log.d("OnSwipeTouchListener", "GAME PAUSED/RESUMED!");
-            ((MainActivity)context).toggleRunning();
+            onSingleTap();
             return super.onSingleTapUp(e);
         }
     }
@@ -97,5 +95,9 @@ public class OnSwipeTouchListener implements OnTouchListener {
     }
 
     public void onSwipeDown() {
+    }
+
+    public void onSingleTap() {
+
     }
 }

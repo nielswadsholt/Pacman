@@ -22,9 +22,9 @@ public class MainActivity extends AppCompatActivity {
     private Timer pacTimer;
     private int pacCounter;
     private int timeCounter;
-    private boolean running = false;
+    private boolean running;
     private int pacmove = 3; // how many pixel the pac-man moves per update
-    private int period = 200; // number of milliseconds between each update
+    private int period = 180; // number of milliseconds between each update
     Bundle runningInstanceState; // for saving state through stop / restart events
 
     @SuppressLint("ClickableViewAccessibility")
@@ -42,23 +42,31 @@ public class MainActivity extends AppCompatActivity {
         gameView.setOnTouchListener(new OnSwipeTouchListener(this) {
             @Override
             public void onSwipeLeft() {
-                running = true;
+                if (!running) resumeGame();
                 game.moveLeft();
             }
             @Override
             public void onSwipeRight() {
-                running = true;
+                if (!running) resumeGame();
                 game.moveRight();
             }
             @Override
             public void onSwipeUp() {
-                running = true;
+                if (!running) resumeGame();
                 game.moveUp();
             }
             @Override
             public void onSwipeDown() {
-                running = true;
+                if (!running) resumeGame();
                 game.moveDown();
+            }
+
+            @Override
+            public void onSingleTap() {
+                Log.d("OnSwipeTouchListener", "GAME PAUSED/RESUMED!");
+
+                if (running) pauseGame();
+                else resumeGame();
             }
         });
 
@@ -86,6 +94,9 @@ public class MainActivity extends AppCompatActivity {
 
                 }, 0, period);
                 resetTime();
+
+                // start game
+                running = true;
             }
         });
     }
@@ -95,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         Log.d("lifeCycle", "onStop called");
         runningInstanceState.putBoolean("running", running); // save running state
-        stopRunning(); // pause game
+        pauseGame();
     }
 
     @Override
@@ -103,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         super.onRestart();
         Log.d("lifeCycle", "onRestart called");
         running = runningInstanceState.getBoolean("running"); // restore running state
+        if (running) resumeGame();
     }
 
     @Override
@@ -156,26 +168,19 @@ public class MainActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            pauseGame();
             Toast.makeText(this,"settings clicked",Toast.LENGTH_LONG).show();
             return true;
         } else if (id == R.id.action_newGame) {
-            resetTime();
-            game.newGame();
+            resumeGame();
+            gameView.restart();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    void toggleRunning() {
-        running = !running;
-    }
-
     void stopRunning() {
         running = false;
-    }
-
-    void startRunning() {
-        running = true;
     }
 
     void resetTime() {
@@ -183,5 +188,15 @@ public class MainActivity extends AppCompatActivity {
         pacCounter = 0;
         timeCounter = 60;
         timerView.setText(getResources().getString(R.string.time, pacCounter));
+    }
+
+    void pauseGame() {
+        gameView.addPauseOverlay();
+        running = false;
+    }
+
+    void resumeGame() {
+        gameView.removePauseOverlay();
+        running = true;
     }
 }
