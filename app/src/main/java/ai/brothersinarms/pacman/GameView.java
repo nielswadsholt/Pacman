@@ -103,6 +103,8 @@ public class GameView extends View {
     }
 
     public void endGame(CharSequence message) {
+        Log.d("endGame", "endGame called");
+        ((MainActivity)context).stopRunning();
         declareResult(message);
     }
 }

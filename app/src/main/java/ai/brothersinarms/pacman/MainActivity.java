@@ -25,11 +25,14 @@ public class MainActivity extends AppCompatActivity {
     private boolean running = false;
     private int pacmove = 3; // How many pixel the pac-man moves per update
     private int period = 200; // Number of milliseconds between each update
+    Bundle startStopState;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        startStopState = new Bundle();
+
         //saying we want the game to run in one mode only
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_main);
@@ -87,10 +90,25 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
     @Override
     protected void onStop() {
         super.onStop();
+        Log.d("lifeCycle", "onStop called");
+        startStopState.putBoolean("running", running); // save running state
+        stopRunning(); // pause game
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        Log.d("lifeCycle", "onRestart called");
+        running = startStopState.getBoolean("running"); // restore running state
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d("lifeCycle", "onDestroy called");
         //just to make sure if the app is killed, that we stop the timer.
         pacTimer.cancel();
     }
@@ -150,6 +168,14 @@ public class MainActivity extends AppCompatActivity {
 
     void toggleRunning() {
         running = !running;
+    }
+
+    void stopRunning() {
+        running = false;
+    }
+
+    void startRunning() {
+        running = true;
     }
 
     void resetTime() {
