@@ -23,15 +23,15 @@ public class MainActivity extends AppCompatActivity {
     private int pacCounter;
     private int timeCounter;
     private boolean running = false;
-    private int pacmove = 3; // How many pixel the pac-man moves per update
-    private int period = 200; // Number of milliseconds between each update
-    Bundle startStopState;
+    private int pacmove = 3; // how many pixel the pac-man moves per update
+    private int period = 200; // number of milliseconds between each update
+    Bundle runningInstanceState; // for saving state through stop / restart events
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        startStopState = new Bundle();
+        runningInstanceState = new Bundle();
 
         //saying we want the game to run in one mode only
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop() {
         super.onStop();
         Log.d("lifeCycle", "onStop called");
-        startStopState.putBoolean("running", running); // save running state
+        runningInstanceState.putBoolean("running", running); // save running state
         stopRunning(); // pause game
     }
 
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onRestart() {
         super.onRestart();
         Log.d("lifeCycle", "onRestart called");
-        running = startStopState.getBoolean("running"); // restore running state
+        running = runningInstanceState.getBoolean("running"); // restore running state
     }
 
     @Override

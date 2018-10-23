@@ -30,6 +30,7 @@ public class Game {
     private Matrix blinkyMatrix;
     private int pacX, pacY; // current position of pacman
     private int dirX, dirY; // current direction of pacman
+    private int nextDirX, nextDirY; // next direction of pacman
     //the list of goldCoins - initially empty
     private ArrayList<GoldCoin> coins = new ArrayList<>();
     private GameView gameView;
@@ -152,9 +153,19 @@ public class Game {
 
     void movePacman()
     {
-        int newPacX = (pacX + dirX + w ) % w;
-        int newPacY = (pacY + dirY + h) % h;
+        int newPacX = (pacX + nextDirX + w ) % w;
+        int newPacY = (pacY + nextDirY + h) % h;
         Log.d("movePacman", "w = " + w + ", h = " + h + ", newPacX = " + newPacX + ", newPacY = " + newPacY + ", dirX = " + dirX + ", dirY = " + dirY);
+
+        // change direction when possible
+        if (board[newPacY][newPacX] == '#') {
+            newPacX = (pacX + dirX + w ) % w;
+            newPacY = (pacY + dirY + h) % h;
+        }
+        else {
+            dirX = nextDirX;
+            dirY = nextDirY;
+        }
 
         int degrees = 0;
         if (dirX < 0) degrees = 180;
@@ -184,8 +195,8 @@ public class Game {
     }
 
     private void changeDirection(int x, int y) {
-        dirX = x;
-        dirY = y;
+        nextDirX = x;
+        nextDirY = y;
     }
 
     void moveLeft() {
