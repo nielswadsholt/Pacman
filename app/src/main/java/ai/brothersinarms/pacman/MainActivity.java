@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private int timeCounter;
     private boolean running;
     private int pacmove = 3; // how many pixel the pac-man moves per update
-    private int period = 180; // number of milliseconds between each update
+    private int period = 90; // number of milliseconds between each update
     Bundle runningInstanceState; // for saving state through stop / restart events
 
     @SuppressLint("ClickableViewAccessibility")
@@ -145,11 +145,15 @@ public class MainActivity extends AppCompatActivity {
             {
                 pacCounter++;
                 timeCounter+= 2;
-                //update the counter - notice this is NOT seconds in this example
-                //you need TWO counters - one for the time and one for the pacman
                 timerView.setText(getResources().getString(R.string.time, pacCounter));
-                game.movePacman(); //move the pacman
 
+                if (pacCounter % 2 == 0) {
+                    game.movePacman();
+                }
+
+                if (pacCounter % 3 == 0) {
+                    game.moveGhosts();
+                }
             }
         }
     };

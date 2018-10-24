@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  *
@@ -26,13 +27,10 @@ public class Game {
     private Bitmap boardBitmap;
     private Bitmap pacBitmap;
     private Matrix pacMatrix;
-    private Bitmap blinkyBitmap;
-    private Matrix blinkyMatrix;
+    private Ghost blinky;
     private int pacX, pacY; // current position of pacman
     private int dirX, dirY; // current direction of pacman
     private int nextDirX, nextDirY; // next direction of pacman
-    //the list of goldCoins - initially empty
-    private ArrayList<GoldCoin> coins = new ArrayList<>();
     private GameView gameView;
     private int w, h; //height and width of the game map
     private int widthOffset, heightOffset; // distance from screen edge to game map
@@ -41,15 +39,15 @@ public class Game {
     private int pacOffset;
     private char[][]board;
     private int dotCount;
+    private static Random random = new Random();
 
     public int getHeight() { return h; }
     public int getPoints() { return points; }
-    public ArrayList<GoldCoin> getCoins() { return coins; }
     Bitmap getPacBitmap() { return pacBitmap; }
     Bitmap getBoardBitmap(){ return boardBitmap; }
     Matrix getPacMatrix() { return pacMatrix; }
-    Bitmap getBlinkyBitmap() { return blinkyBitmap; }
-    Matrix getBlinkyMatrix() { return blinkyMatrix; }
+    Bitmap getBlinkyBitmap() { return blinky.bitmap; }
+    Matrix getBlinkyMatrix() { return blinky.matrix; }
 
     int getPacX() {
         return pacX;
@@ -62,7 +60,6 @@ public class Game {
     int getWidthOffset() { return widthOffset; }
     int getHeightOffset() { return heightOffset; }
     int getTileSize() { return tileSize; }
-    char[][] getBoard() { return board; }
 
     Game(Context context, GameView gameView, TextView pointsView)
     {
@@ -71,9 +68,11 @@ public class Game {
         this.pointsView = pointsView;
         boardBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.game_board_dots);
         pacBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.pacman_right);
-        blinkyBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.blinky);
         pacMatrix = new Matrix();
-        blinkyMatrix = new Matrix();
+
+        blinky = new Ghost();
+        blinky.bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.blinky);
+        blinky.matrix = new Matrix();
     }
 
     void newGame()
@@ -85,7 +84,13 @@ public class Game {
         Log.d("newGame", "tileSize = " + tileSize + ", pacOffset = " + pacOffset + ", pacSize = " + pacSize);
         Log.d("newGame", "pacX = " + pacX + ", pacY = " + pacY + ", widthOffset = " + widthOffset + ", heightOffset = " + heightOffset);
         pacMatrix.setTranslate(scaleToMap(pacX) - pacOffset + widthOffset, scaleToMap(pacY) - pacOffset + heightOffset);
-        blinkyMatrix.setTranslate(scaleToMap(14) - pacOffset + widthOffset, scaleToMap(11) - pacOffset + heightOffset);
+        blinky.x = 14;
+        blinky.y = 11;
+        blinky.dirX = 1;
+        blinky.dirY = 0;
+        blinky.nextDirX = 0;
+        blinky.nextDirY = -1;
+        blinky.matrix.setTranslate(scaleToMap(blinky.x) - pacOffset + widthOffset, scaleToMap(blinky.y) - pacOffset + heightOffset);
 
         //reset the points
         points = 0;
@@ -147,8 +152,78 @@ public class Game {
         Log.d("gameSize", "board: width = " + this.w * tileSize + ", height = " + this.h * tileSize);
         Log.d("gameSize", "widthOffset = " + widthOffset + ", heightOffset = " + heightOffset);
         pacBitmap = Bitmap.createScaledBitmap(pacBitmap, pacSize, pacSize, true);
-        blinkyBitmap = Bitmap.createScaledBitmap(blinkyBitmap, pacSize, pacSize, true);
+        blinky.bitmap = Bitmap.createScaledBitmap(blinky.bitmap, pacSize, pacSize, true);
         Log.d("gameSize", "pacman: " + pacSize);
+    }
+
+    void moveGhosts() {
+        boolean directionChanged = false;
+        int newX = (blinky.x + blinky.nextDirX + w ) % w;
+        int newY = (blinky.y + blinky.nextDirY + h) % h;
+
+        // change direction when possible
+        if (board[newY][newX] == '#') {
+            newX = (blinky.x + blinky.dirX + w) % w;
+            newY = (blinky.y + blinky.dirY + h) % h;
+        }
+        else {
+            blinky.dirX = blinky.nextDirX;
+            blinky.dirY = blinky.nextDirY;
+            directionChanged = true;
+        }
+
+        // change direction randomly when reaching a wall
+        if (board[newY][newX] == '#') {
+            if (blinky.dirX == 0) {
+                blinky.dirX = new int[] {-1, 1}[random.nextInt(2)];
+                blinky.dirY = 0;
+                blinky.nextDirX = 0;
+                blinky.nextDirY = new int[] {-1, 1}[random.nextInt(2)];
+            }
+            else {
+                blinky.dirX = 0;
+                blinky.dirY = new int[] {-1, 1}[random.nextInt(2)];
+                blinky.nextDirX = new int[] {-1, 1}[random.nextInt(2)];
+                blinky.nextDirY = 0;
+            }
+            newX = (blinky.x + blinky.dirX + w) % w;
+            newY = (blinky.y + blinky.dirY + h) % h;
+
+            // try the opposite way if hitting another wall
+            if (board[newY][newX] == '#') {
+                blinky.dirX *= -1;
+                blinky.dirY *= -1;
+            }
+
+            directionChanged = true;
+        }
+
+//        int degrees = 0;
+//        if (blinky.dirX < 0) degrees = 180;
+//        else if (blinky.dirY > 0) degrees = 90;
+//        else if (blinky.dirY < 0) degrees = -90;
+
+        // make move if new tile is not a wall
+        if (board[newY][newX] != '#') {
+            blinky.x = newX;
+            blinky.y = newY;
+            blinky.matrix.setRotate(0, blinky.bitmap.getWidth() / 2, blinky.bitmap.getHeight() / 2);
+            blinky.matrix.postTranslate(scaleToMap(blinky.x) - pacOffset + widthOffset, scaleToMap(blinky.y) - pacOffset + heightOffset);
+        }
+
+        // change next direction if current direction changed
+        if (directionChanged) {
+            if (blinky.dirX == 0) {
+                blinky.nextDirX = new int[] {-1, 1}[random.nextInt(2)];
+                blinky.nextDirY = 0;
+            }
+            else {
+                blinky.nextDirX = 0;
+                blinky.nextDirY =  new int[] {-1, 1}[random.nextInt(2)];
+            }
+        }
+
+        gameView.invalidate();
     }
 
     void movePacman()
@@ -227,17 +302,7 @@ public class Game {
     }
 
     private boolean isEaten() {
-        float[] pacValues = new float[9];
-        pacMatrix.getValues(pacValues);
-        float[] blinkyValues = new float[9];
-        blinkyMatrix.getValues(blinkyValues);
-        Log.d("matrix", "pacValues[Matrix.MTRANS_X] = " + pacValues[Matrix.MTRANS_X]
-                + ", blinkyValues[Matrix.MTRANS_X] = " + blinkyValues[Matrix.MTRANS_X]);
-        Log.d("matrix", "pacValues[Matrix.MTRANS_Y] = " + pacValues[Matrix.MTRANS_Y]
-                + ", blinkyValues[Matrix.MTRANS_Y] = " + blinkyValues[Matrix.MTRANS_Y]);
-
-        return pacValues[Matrix.MTRANS_X] == blinkyValues[Matrix.MTRANS_X]
-                && pacValues[Matrix.MTRANS_Y] == blinkyValues[Matrix.MTRANS_Y];
+        return Math.sqrt(Math.pow(pacX - blinky.x, 2) + Math.pow(pacY - blinky.y, 2)) <= 1;
     }
 
     int scaleToMap(int coordinate){
