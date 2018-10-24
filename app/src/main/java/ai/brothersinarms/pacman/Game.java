@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.widget.TextView;
 
@@ -16,35 +15,39 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Random;
 
-/**
- *
- * This class should contain all your game logic
- */
-
 public class Game {
     private Context context;
-    private int points = 0; //how many points do we have
-    private TextView pointsView;
+    private GameView gameView;
+    private TextView scoreView;
+
+    // graphical game board (all measures are in pixels)
     private Bitmap boardBitmap;
+    private int widthOffset, heightOffset; // distance from screen edge to game map
+    private int tileSize; // size of a single tile
+    private int pacSize; // size of a game character
+    private int pacOffset; // offset to account for game character vs. tile size difference
+
+    // logical game board (all measures are # of tiles)
+    private char[][]board; // the logical game board
+    private int h, w; // height and width of the logical game board
+
+    // game characters
     private Bitmap pacBitmap;
-    private Matrix pacMatrix;
-    private Ghost[] ghosts;
-    private int pacX, pacY; // current position of pacman
+    private Matrix pacMatrix; // controls pacman's position / rotation
+    private int pacX, pacY; // current position of pacman (measured in tiles)
     private int dirX, dirY; // current direction of pacman
     private int nextDirX, nextDirY; // next direction of pacman
-    private GameView gameView;
-    private int widthOffset, heightOffset; // distance from screen edge to game map
-    private int tileSize;
-    private int pacSize;
-    private int pacOffset;
-    private char[][]board; // the logical game board
-    private int w, h; // height and width of the logical game board (# of tiles)
-    private int dotCount;
-    private boolean active;
+    private Ghost[] ghosts;
+
+    // keeping score
+    private int dotCount; // remaining dots
+    private int score = 0; // number of points earned (10 per dot eaten)
+
+    // other
+    private boolean active; // state variable used to determine action for swipe gestures
     private static Random random = new Random();
 
     public int getHeight() { return h; }
-    public int getPoints() { return points; }
     Bitmap getPacBitmap() { return pacBitmap; }
     Bitmap getBoardBitmap(){ return boardBitmap; }
     Matrix getPacMatrix() { return pacMatrix; }
@@ -60,11 +63,11 @@ public class Game {
     int getTileSize() { return tileSize; }
     boolean isActive() { return active; }
 
-    Game(Context context, GameView gameView, TextView pointsView)
+    Game(Context context, GameView gameView, TextView scoreView)
     {
         this.context = context;
         this.gameView = gameView;
-        this.pointsView = pointsView;
+        this.scoreView = scoreView;
         boardBitmap = BitmapFactory.decodeResource(context.getResources(),
                 R.drawable.game_board_dots);
         pacBitmap = BitmapFactory.decodeResource(context.getResources(),
@@ -118,8 +121,8 @@ public class Game {
             Ghost ghost = ghosts[i];
             ghost.x = ghostsXY[i][0];
             ghost.y = ghostsXY[i][1];
-            ghost.dirX = 1;
-            ghost.dirY = 0;
+            ghost.dirX = 0;
+            ghost.dirY = 1;
             ghost.nextDirX = 0;
             ghost.nextDirY = -1;
             ghost.matrix.setTranslate(
@@ -128,9 +131,9 @@ public class Game {
 
         }
 
-        //reset points
-        points = 0;
-        pointsView.setText(context.getResources().getString(R.string.points, points));
+        //reset score
+        score = 0;
+        scoreView.setText(context.getResources().getString(R.string.score, score));
 
         // start game
         active = true;
@@ -315,14 +318,18 @@ public class Game {
 
         // game over or won?
         if (isEaten()) {
-            active = false;
-            gameView.endGame(gameView.getResources().getString(R.string.gameover));
+            gameOver();
         } else if (dotCount < 1) {
             active = false;
             gameView.endGame(gameView.getResources().getString(R.string.youwin));
         }
 
         gameView.invalidate();
+    }
+
+    void gameOver() {
+        active = false;
+        gameView.endGame(gameView.getResources().getString(R.string.gameover));
     }
 
     private void changeDirection(int x, int y) {
@@ -351,9 +358,9 @@ public class Game {
         // eat dot and update score
         if (board[pacY][pacX] == '*') {
             dotCount--;
-            points += 10;
+            score += 10;
             board[pacY][pacX] = ' ';
-            pointsView.setText(context.getResources().getString(R.string.points, points));
+            scoreView.setText(context.getResources().getString(R.string.score, score));
         }
     }
 

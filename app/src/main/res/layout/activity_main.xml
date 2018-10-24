@@ -10,19 +10,19 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <TextView
-            android:id="@+id/points"
-            android:textSize="24sp"
+            android:id="@+id/score"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/points" />
+            android:textSize="24sp"
+            android:text="@string/score" />
         <TextView
             android:id="@+id/clock"
-            android:textSize="24sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/points" />
+            android:textSize="24sp"
+            android:text="@string/time" />
     </LinearLayout>
 
     <!-- Notice how the custom view is referenced here with

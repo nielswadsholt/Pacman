@@ -19,12 +19,16 @@ public class MainActivity extends AppCompatActivity {
     GameView gameView;
     TextView timerView;
     Game game;
+
+    private Timer timer;
+    private int counter;
+    private int period = 1000; // number of milliseconds between each update
+
     private Timer pacTimer;
     private int pacCounter;
-    private int timeCounter;
+    private int pacPeriod = 70; // number of milliseconds between each update
+
     private boolean running;
-    private int pacmove = 3; // how many pixel the pac-man moves per update
-    private int period = 70; // number of milliseconds between each update
     Bundle runningInstanceState; // for saving state through stop / restart events
 
     @SuppressLint("ClickableViewAccessibility")
@@ -70,8 +74,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        TextView textView = findViewById(R.id.points);
+        TextView textView = findViewById(R.id.score);
         timerView = findViewById(R.id.clock);
+//        timerView.setText(getResources().getString(R.string.time, 60));
         game = new Game(this, gameView, textView);
 
         // Get dimensions of gameView once created, then pass it to the game and finally pass THAT to the gameView
@@ -84,15 +89,25 @@ public class MainActivity extends AppCompatActivity {
 
                 Log.d("onCreate", "onCreate: gameView.getWidth() = " + gameView.getWidth());
 
-                // Set up timer
-                pacTimer = new Timer();
-                pacTimer.schedule(new TimerTask() {
+                // Set up timers
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
                         TimerMethod();
                     }
 
                 }, 0, period);
+
+                pacTimer = new Timer();
+                pacTimer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        PacTimerMethod();
+                    }
+
+                }, 0, pacPeriod);
+
                 resetTime();
 
                 // start game
@@ -122,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         Log.d("lifeCycle", "onDestroy called");
         //just to make sure if the app is killed, that we stop the timer.
+        timer.cancel();
         pacTimer.cancel();
     }
 
@@ -133,19 +149,39 @@ public class MainActivity extends AppCompatActivity {
         //We call the method that will work with the UI
         //through the runOnUiThread method.
         this.runOnUiThread(Timer_Tick);
-
     }
 
     private Runnable Timer_Tick = new Runnable() {
         public void run() {
 
-            //This method runs in the same thread as the UI.
-            // so we can draw
+            if (running)
+            {
+                counter--;
+                timerView.setText(getResources().getString(R.string.time, counter));
+
+                if (counter == 0) {
+                    game.gameOver();
+                }
+            }
+        }
+    };
+
+    private void PacTimerMethod()
+    {
+        //This method is called directly by the timer
+        //and runs in the same thread as the timer.
+
+        //We call the method that will work with the UI
+        //through the runOnUiThread method.
+        this.runOnUiThread(PacTimer_Tick);
+    }
+
+    private Runnable PacTimer_Tick = new Runnable() {
+        public void run() {
+
             if (running)
             {
                 pacCounter++;
-                timeCounter+= 2;
-                timerView.setText(getResources().getString(R.string.time, pacCounter));
 
                 if (pacCounter % 2 == 0) {
                     game.movePacman();
@@ -189,9 +225,9 @@ public class MainActivity extends AppCompatActivity {
 
     void resetTime() {
         running = false;
+        counter = 60;
         pacCounter = 0;
-        timeCounter = 60;
-        timerView.setText(getResources().getString(R.string.time, pacCounter));
+        timerView.setText(getResources().getString(R.string.time, counter));
     }
 
     void pauseGame() {
