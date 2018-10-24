@@ -287,13 +287,13 @@ public class Game {
         Log.d("movePacman", "w = " + w + ", h = " + h + ", newPacX = " + newPacX + ", newPacY = " + newPacY + ", dirX = " + dirX + ", dirY = " + dirY);
 
         // change direction when possible
-        if (board[newPacY][newPacX] == '#') {
-            newPacX = (pacX + dirX + w ) % w;
-            newPacY = (pacY + dirY + h) % h;
-        }
-        else {
+        if (board[newPacY][newPacX] == ' ' || board[newPacY][newPacX] == '*') {
             dirX = nextDirX;
             dirY = nextDirY;
+        }
+        else {
+            newPacX = (pacX + dirX + w ) % w;
+            newPacY = (pacY + dirY + h) % h;
         }
 
         int degrees = 0;
@@ -303,8 +303,8 @@ public class Game {
 
         Log.d("movePacman", "board[pacY-1][pacX-1] = " + board[newPacY][newPacX]);
 
-        // make move if new tile is not a wall
-        if (board[newPacY][newPacX] != '#') {
+        // make move if tile is empty or contains a dot
+        if (board[newPacY][newPacX] == ' ' || board[newPacY][newPacX] == '*') {
             pacX = newPacX;
             pacY = newPacY;
             pacMatrix.setRotate(degrees, pacBitmap.getWidth() / 2, pacBitmap.getHeight() / 2);
