@@ -39,6 +39,7 @@ public class Game {
     private int pacOffset;
     private char[][]board;
     private int dotCount;
+    private boolean active;
     private static Random random = new Random();
 
     public int getHeight() { return h; }
@@ -48,18 +49,16 @@ public class Game {
     Matrix getPacMatrix() { return pacMatrix; }
     Bitmap getBlinkyBitmap() { return blinky.bitmap; }
     Matrix getBlinkyMatrix() { return blinky.matrix; }
-
     int getPacX() {
         return pacX;
     }
-
     int getPacY() {
         return pacY;
     }
-
     int getWidthOffset() { return widthOffset; }
     int getHeightOffset() { return heightOffset; }
     int getTileSize() { return tileSize; }
+    boolean isActive() { return active; }
 
     Game(Context context, GameView gameView, TextView pointsView)
     {
@@ -95,6 +94,9 @@ public class Game {
         //reset the points
         points = 0;
         pointsView.setText(context.getResources().getString(R.string.points, points));
+
+        // start game
+        active = true;
 
         //redraw screen
         gameView.invalidate();
@@ -143,17 +145,27 @@ public class Game {
 
     private void setSize(int viewWidth)
     {
+        // divide width in pixels by logical width in tiles
         tileSize = viewWidth / this.w;
+
+        // left/top board edges begin at half of excess space
         widthOffset = (gameView.getWidth() - this.w * tileSize) / 2 - tileSize;
         heightOffset = (gameView.getHeight() - this.h * tileSize) / 2 - tileSize;
+
+        // set size and offset of drawn characters
         pacSize = this.w * tileSize / 16;
-        pacOffset = (pacSize - tileSize) / 2; // offsets pac-man's drawing coordinates relative to its tile's
+
+        // offset characters' drawing coordinates relative to their tile
+        pacOffset = (pacSize - tileSize) / 2;
+
+        // scale bitmaps according to computed measures
         boardBitmap = Bitmap.createScaledBitmap(boardBitmap, this.w * tileSize, this.h * tileSize, true);
-        Log.d("gameSize", "board: width = " + this.w * tileSize + ", height = " + this.h * tileSize);
-        Log.d("gameSize", "widthOffset = " + widthOffset + ", heightOffset = " + heightOffset);
         pacBitmap = Bitmap.createScaledBitmap(pacBitmap, pacSize, pacSize, true);
         blinky.bitmap = Bitmap.createScaledBitmap(blinky.bitmap, pacSize, pacSize, true);
-        Log.d("gameSize", "pacman: " + pacSize);
+
+        Log.d("gameSize", "board: width = " + this.w * tileSize + ", height = " + this.h * tileSize);
+        Log.d("gameSize", "widthOffset = " + widthOffset + ", heightOffset = " + heightOffset);
+        Log.d("gameSize", "pacSize: " + pacSize);
     }
 
     void moveGhosts() {
@@ -261,8 +273,10 @@ public class Game {
 
         // game over or won?
         if (isEaten()) {
+            active = false;
             gameView.endGame(gameView.getResources().getString(R.string.gameover));
         } else if (dotCount < 1) {
+            active = false;
             gameView.endGame(gameView.getResources().getString(R.string.youwin));
         }
 

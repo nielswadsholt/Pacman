@@ -42,22 +42,22 @@ public class MainActivity extends AppCompatActivity {
         gameView.setOnTouchListener(new OnSwipeTouchListener(this) {
             @Override
             public void onSwipeLeft() {
-                if (!running) resumeGame();
+                if (game.isActive() && !running) resumeGame();
                 game.moveLeft();
             }
             @Override
             public void onSwipeRight() {
-                if (!running) resumeGame();
+                if (game.isActive() && !running) resumeGame();
                 game.moveRight();
             }
             @Override
             public void onSwipeUp() {
-                if (!running) resumeGame();
+                if (game.isActive() && !running) resumeGame();
                 game.moveUp();
             }
             @Override
             public void onSwipeDown() {
-                if (!running) resumeGame();
+                if (game.isActive() && !running) resumeGame();
                 game.moveDown();
             }
 
