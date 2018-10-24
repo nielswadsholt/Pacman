@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private int timeCounter;
     private boolean running;
     private int pacmove = 3; // how many pixel the pac-man moves per update
-    private int period = 90; // number of milliseconds between each update
+    private int period = 70; // number of milliseconds between each update
     Bundle runningInstanceState; // for saving state through stop / restart events
 
     @SuppressLint("ClickableViewAccessibility")

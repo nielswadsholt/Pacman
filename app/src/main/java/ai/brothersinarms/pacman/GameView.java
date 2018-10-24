@@ -54,7 +54,10 @@ public class GameView extends View {
         int w = getWidth();
         int tileSize = game.getTileSize();
 
+        // draw background
         canvas.drawColor(Color.BLACK);
+
+        // draw game board
         Bitmap boardBitmap = game.getBoardBitmap();
         canvas.drawBitmap(
                 boardBitmap,
@@ -62,6 +65,7 @@ public class GameView extends View {
                 h / 2 - boardBitmap.getHeight() / 2,
                 paint);
 
+        // erase eaten dots
         path.addRect(
                 game.scaleToMap(game.getPacX()) + game.getWidthOffset(),
                 game.scaleToMap(game.getPacY()) + game.getHeightOffset(),
@@ -70,12 +74,14 @@ public class GameView extends View {
                 Path.Direction.CCW);
         canvas.drawPath(path, paint);
 
-        // draw the pac-man
+        // draw pacman
         Bitmap pacBitmap = game.getPacBitmap();
         canvas.drawBitmap(pacBitmap, game.getPacMatrix(), paint);
 
         // draw enemies
-        canvas.drawBitmap(game.getBlinkyBitmap(), game.getBlinkyMatrix(), paint);
+        for (Ghost ghost : game.getGhosts()) {
+            canvas.drawBitmap(ghost.bitmap, ghost.matrix, paint);
+        }
 
         super.onDraw(canvas);
     }
