@@ -1,10 +1,12 @@
 <resources>
     <string name="app_name">Pacman</string>
-    <string name="score">Score: %1$d</string>
+    <string name="hiscore_txt">Hi-Score\n%1$d</string>
+    <string name="score_txt">%1$d</string>
     <string name="move_right">Move Rigth</string>
     <string name="action_settings">Settings</string>
     <string name="newgame">New Game</string>
     <string name="youwin">You win!</string>
     <string name="gameover">Game Over</string>
-    <string name="time">Time: %1$d</string>
+    <string name="time_txt">Time left\n%1$d</string>
+    <string name="hiscore_key">hiscore</string>
 </resources>

@@ -83,6 +83,15 @@ public class GameView extends View {
             canvas.drawBitmap(ghost.bitmap, ghost.matrix, paint);
         }
 
+        if (game.state == Game.READY) {
+            Bitmap readyBitmap = game.getReadyBitmap();
+            canvas.drawBitmap(
+                    readyBitmap,
+                    w / 2 - boardBitmap.getWidth() / 2,
+                    h / 2 - boardBitmap.getHeight() / 2,
+                    paint);
+        }
+
         super.onDraw(canvas);
     }
 
@@ -118,12 +127,12 @@ public class GameView extends View {
     }
 
     void addPauseOverlay() {
-        Drawable overlay = getResources().getDrawable(R.drawable.game_pause);
-        overlay.setBounds(0, 0, getMeasuredWidth(), getMeasuredHeight());
+        Drawable overlay = getResources().getDrawable(R.drawable.pause_overlay);
+        overlay.setBounds(0, 0, getWidth(), getHeight());
         getOverlay().add(overlay);
     }
 
-    void removePauseOverlay() {
+    void removeOverlay() {
         getOverlay().clear();
     }
 }

@@ -1,6 +1,8 @@
 package ai.brothersinarms.pacman;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +31,9 @@ public class MainActivity extends AppCompatActivity {
     private int pacPeriod = 70; // number of milliseconds between each update
 
     private boolean running;
-    Bundle runningInstanceState; // for saving state through stop / restart events
+    private Bundle runningInstanceState; // for saving state through stop / restart events
+
+    public boolean isRunning() { return running;}
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -46,22 +50,22 @@ public class MainActivity extends AppCompatActivity {
         gameView.setOnTouchListener(new OnSwipeTouchListener(this) {
             @Override
             public void onSwipeLeft() {
-                if (game.isActive() && !running) resumeGame();
+                if (game.state != Game.FINISHED && !running) resumeGame();
                 game.moveLeft();
             }
             @Override
             public void onSwipeRight() {
-                if (game.isActive() && !running) resumeGame();
+                if (game.state != Game.FINISHED && !running) resumeGame();
                 game.moveRight();
             }
             @Override
             public void onSwipeUp() {
-                if (game.isActive() && !running) resumeGame();
+                if (game.state != Game.FINISHED && !running) resumeGame();
                 game.moveUp();
             }
             @Override
             public void onSwipeDown() {
-                if (game.isActive() && !running) resumeGame();
+                if (game.state != Game.FINISHED && !running) resumeGame();
                 game.moveDown();
             }
 
@@ -74,10 +78,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        TextView textView = findViewById(R.id.score);
+        TextView hiscoreView = findViewById(R.id.hiscore);
+        TextView scoreView = findViewById(R.id.score);
         timerView = findViewById(R.id.clock);
-//        timerView.setText(getResources().getString(R.string.time, 60));
-        game = new Game(this, gameView, textView);
+
+        SharedPreferences sharedPref =
+                getSharedPreferences(getString(R.string.hiscore_key), Context.MODE_PRIVATE);
+        int hiscore = sharedPref.getInt(getString(R.string.hiscore_key), 0);
+
+        game = new Game(this, gameView, scoreView, hiscoreView, hiscore);
 
         // Get dimensions of gameView once created, then pass it to the game and finally pass THAT to the gameView
         gameView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -109,9 +118,6 @@ public class MainActivity extends AppCompatActivity {
                 }, 0, pacPeriod);
 
                 resetTime();
-
-                // start game
-                running = true;
             }
         });
     }
@@ -134,11 +140,21 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         Log.d("lifeCycle", "onDestroy called");
         //just to make sure if the app is killed, that we stop the timer.
         timer.cancel();
         pacTimer.cancel();
+
+        // save hi-score
+        game.updateHiscore();
+
+        SharedPreferences sharedPref =
+                getSharedPreferences(getString(R.string.hiscore_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(getString(R.string.hiscore_key), game.getHiscore());
+        editor.apply();
+
+        super.onDestroy();
     }
 
     private void TimerMethod()
@@ -157,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
             if (running)
             {
                 counter--;
-                timerView.setText(getResources().getString(R.string.time, counter));
+                timerView.setText(getResources().getString(R.string.time_txt, counter));
 
                 if (counter == 0) {
                     game.gameOver();
@@ -227,7 +243,7 @@ public class MainActivity extends AppCompatActivity {
         running = false;
         counter = 60;
         pacCounter = 0;
-        timerView.setText(getResources().getString(R.string.time, counter));
+        timerView.setText(getResources().getString(R.string.time_txt, counter));
     }
 
     void pauseGame() {
@@ -236,7 +252,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void resumeGame() {
-        gameView.removePauseOverlay();
+        game.state = Game.ACTIVE;
+        gameView.removeOverlay();
         running = true;
     }
 }

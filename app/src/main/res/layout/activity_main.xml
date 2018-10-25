@@ -8,25 +8,39 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:background="@android:color/black">
+        <TextView
+            android:id="@+id/hiscore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="25"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/emulogic"
+            android:textSize="14sp"
+            android:text="@string/hiscore_txt" />
         <TextView
             android:id="@+id/score"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="24sp"
-            android:text="@string/score" />
+            android:layout_weight="30"
+            android:textAlignment="center"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/emulogic"
+            android:textSize="14sp"
+            android:text="@string/score_txt" />
         <TextView
             android:id="@+id/clock"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:textSize="24sp"
-            android:text="@string/time" />
+            android:layout_weight="25"
+            android:textAlignment="textEnd"
+            android:textColor="@android:color/white"
+            android:fontFamily="@font/emulogic"
+            android:textSize="14sp"
+            android:text="@string/time_txt" />
     </LinearLayout>
 
-    <!-- Notice how the custom view is referenced here with
-    a full package path-->
     <ai.brothersinarms.pacman.GameView
         android:id="@+id/gameView"
         android:layout_width="match_parent"
