@@ -4,18 +4,18 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v4.content.res.ResourcesCompat;
-import android.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewTreeObserver;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.support.v4.content.res.ResourcesCompat;
+import android.app.ActionBar;
+import android.widget.RelativeLayout;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -281,7 +281,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences sharedPref =
                 getPreferences(Context.MODE_PRIVATE);
-        counter = sharedPref.getInt(getString(R.string.time_limit_key), 0);
+        counter = sharedPref.getInt(getString(R.string.time_limit_key), 60);
         pacCounter = 0;
         timerView.setText(getResources().getString(R.string.time_txt, counter));
     }
