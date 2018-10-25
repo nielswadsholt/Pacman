@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Pacman</string>
+    <string name="app_name">Pac-Man</string>
     <string name="hiscore_txt">Hi-Score\n%1$d</string>
     <string name="score_txt">%1$d</string>
     <string name="move_right">Move Rigth</string>
@@ -9,4 +9,9 @@
     <string name="gameover">Game Over</string>
     <string name="time_txt">Time left\n%1$d</string>
     <string name="hiscore_key">hiscore</string>
+    <string name="reset_hi_score">Reset hi-score</string>
+    <string name="time_limit_key">time_limit</string>
+    <string name="time_limit">Time limit</string>
+    <string name="time_60">60 seconds</string>
+    <string name="time_120">120 seconds</string>
 </resources>

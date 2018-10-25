@@ -4,14 +4,18 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.v4.content.res.ResourcesCompat;
+import android.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewTreeObserver;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -33,13 +37,29 @@ public class MainActivity extends AppCompatActivity {
     private boolean running;
     private Bundle runningInstanceState; // for saving state through stop / restart events
 
-    public boolean isRunning() { return running;}
-
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         runningInstanceState = new Bundle();
+
+        // Set action bar title font to Pac-Man font
+        TextView titleView = new TextView(this);
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(
+                ActionBar.LayoutParams.WRAP_CONTENT,
+                ActionBar.LayoutParams.WRAP_CONTENT);
+        titleView.setLayoutParams(lp);
+        titleView.setText(R.string.app_name);
+        titleView.setTextSize(26);
+        titleView.setTextColor(Color.WHITE);
+        Typeface tf = ResourcesCompat.getFont(this, R.font.crackman);
+        titleView.setTypeface(tf);
+        android.support.v7.app.ActionBar actionbar = getSupportActionBar();
+
+        if (actionbar != null) {
+            actionbar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+            actionbar.setCustomView(titleView);
+        }
 
         //saying we want the game to run in one mode only
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -83,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         timerView = findViewById(R.id.clock);
 
         SharedPreferences sharedPref =
-                getSharedPreferences(getString(R.string.hiscore_key), Context.MODE_PRIVATE);
+                getPreferences(Context.MODE_PRIVATE);
         int hiscore = sharedPref.getInt(getString(R.string.hiscore_key), 0);
 
         game = new Game(this, gameView, scoreView, hiscoreView, hiscore);
@@ -149,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
         game.updateHiscore();
 
         SharedPreferences sharedPref =
-                getSharedPreferences(getString(R.string.hiscore_key), Context.MODE_PRIVATE);
+                getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(getString(R.string.hiscore_key), game.getHiscore());
         editor.apply();
@@ -159,11 +179,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void TimerMethod()
     {
-        //This method is called directly by the timer
-        //and runs in the same thread as the timer.
-
-        //We call the method that will work with the UI
-        //through the runOnUiThread method.
         this.runOnUiThread(Timer_Tick);
     }
 
@@ -184,11 +199,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void PacTimerMethod()
     {
-        //This method is called directly by the timer
-        //and runs in the same thread as the timer.
-
-        //We call the method that will work with the UI
-        //through the runOnUiThread method.
         this.runOnUiThread(PacTimer_Tick);
     }
 
@@ -219,20 +229,47 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            pauseGame();
-            Toast.makeText(this,"settings clicked",Toast.LENGTH_LONG).show();
-            return true;
-        } else if (id == R.id.action_newGame) {
-            resumeGame();
-            gameView.restart();
-            return true;
+        SharedPreferences timeLimitPref;
+        SharedPreferences.Editor timeLimitEditor;
+
+        switch (item.getItemId()) {
+            case R.id.action_newGame:
+                resumeGame();
+                gameView.restart();
+                return true;
+            case R.id.action_settings:
+                pauseGame();
+                return true;
+            case R.id.action_reset_hiscore:
+                game.resetHiscore();
+                return true;
+            case R.id.action_time_limit:
+                return true;
+            case R.id.time_60:
+                timeLimitPref =
+                        getPreferences(Context.MODE_PRIVATE);
+                timeLimitEditor = timeLimitPref.edit();
+                timeLimitEditor.putInt(getString(R.string.time_limit_key), 60);
+                timeLimitEditor.apply();
+
+                resumeGame();
+                gameView.restart();
+
+                return true;
+            case R.id.time_120:
+                timeLimitPref =
+                        getPreferences(Context.MODE_PRIVATE);
+                timeLimitEditor = timeLimitPref.edit();
+                timeLimitEditor.putInt(getString(R.string.time_limit_key), 120);
+                timeLimitEditor.apply();
+
+                resumeGame();
+                gameView.restart();
+
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     void stopRunning() {
@@ -241,7 +278,10 @@ public class MainActivity extends AppCompatActivity {
 
     void resetTime() {
         running = false;
-        counter = 60;
+
+        SharedPreferences sharedPref =
+                getPreferences(Context.MODE_PRIVATE);
+        counter = sharedPref.getInt(getString(R.string.time_limit_key), 0);
         pacCounter = 0;
         timerView.setText(getResources().getString(R.string.time_txt, counter));
     }

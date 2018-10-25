@@ -6,13 +6,27 @@
     <item
         android:id="@+id/action_newGame"
         android:orderInCategory="100"
-        app:showAsAction="always"
+        app:showAsAction="ifRoom"
         android:title="@string/newgame"/>
 
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         app:showAsAction="never"
-        android:title="@string/action_settings"/>
+        android:title="@string/action_settings">
+        <menu>
+            <item android:id="@+id/action_reset_hiscore"
+                android:title="@string/reset_hi_score"/>
+            <item android:id="@+id/action_time_limit"
+                android:title="@string/time_limit">
+                <menu>
+                    <item android:id="@+id/time_60"
+                        android:title="@string/time_60"/>
+                    <item android:id="@+id/time_120"
+                        android:title="@string/time_120"/>
+                </menu>
+            </item>
+        </menu>
+    </item>
 
 </menu>

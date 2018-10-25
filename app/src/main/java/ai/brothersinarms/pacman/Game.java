@@ -276,11 +276,6 @@ class Game {
                 directionChanged = true;
             }
 
-//        int degrees = 0;
-//        if (ghost.dirX < 0) degrees = 180;
-//        else if (ghost.dirY > 0) degrees = 90;
-//        else if (ghost.dirY < 0) degrees = -90;
-
             // make move if new tile is not a wall
             if (board[newY][newX] != '#') {
                 ghost.x = newX;
@@ -358,6 +353,12 @@ class Game {
         if (score > hiscore) {
             hiscore = score;
         }
+
+        hiscoreView.setText(context.getResources().getString(R.string.hiscore_txt, hiscore));
+    }
+
+    void resetHiscore() {
+        hiscore = 0;
 
         hiscoreView.setText(context.getResources().getString(R.string.hiscore_txt, hiscore));
     }
