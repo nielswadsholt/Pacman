@@ -50,9 +50,10 @@ class Game {
     // game state
     static final int READY = 0;
     static final int ACTIVE = 1;
-    static final int FINISHED = 2;
+    static final int WON = 2;
+    static final int FINISHED = 3;
 
-    @IntDef({READY, ACTIVE, FINISHED})
+    @IntDef({READY, ACTIVE, WON, FINISHED})
     @interface GameState{}
 
     @GameState int state;
@@ -136,7 +137,6 @@ class Game {
                 new int[] {15, 14}
         };
 
-
         for (int i = 0; i < ghosts.length; i++) {
             Ghost ghost = ghosts[i];
             ghost.x = ghostsXY[i][0];
@@ -151,10 +151,14 @@ class Game {
 
         }
 
-        // update hiscore and reset score
+        // update hiscore
         updateHiscore();
-        score = 0;
-        scoreView.setText(context.getResources().getString(R.string.score_txt, score));
+
+        // reset score if lost
+        if (state == FINISHED) {
+            score = 0;
+            scoreView.setText(String.valueOf(score));
+        }
 
         // ready to start game
         state = READY;
@@ -336,8 +340,8 @@ class Game {
         if (isEaten()) {
             gameOver();
         } else if (dotCount < 1) {
-            state = FINISHED;
-            gameView.endGame(gameView.getResources().getString(R.string.youwin));
+            state = WON;
+            gameView.endGame(gameView.getResources().getString(R.string.nextlevel));
         }
 
         gameView.invalidate();
@@ -392,7 +396,7 @@ class Game {
             dotCount--;
             score += 10;
             board[pacY][pacX] = ' ';
-            scoreView.setText(context.getResources().getString(R.string.score_txt, score));
+            scoreView.setText(String.valueOf(score));
 
             return true;
         }

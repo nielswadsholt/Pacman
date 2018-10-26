@@ -77,22 +77,22 @@ public class MainActivity extends AppCompatActivity {
         gameView.setOnTouchListener(new OnSwipeTouchListener(this) {
             @Override
             public void onSwipeLeft() {
-                if (game.state != Game.FINISHED && !running) resumeGame();
+                if (!running && game.state != Game.FINISHED && game.state != Game.WON) resumeGame();
                 game.moveLeft();
             }
             @Override
             public void onSwipeRight() {
-                if (game.state != Game.FINISHED && !running) resumeGame();
+                if (!running && game.state != Game.FINISHED && game.state != Game.WON) resumeGame();
                 game.moveRight();
             }
             @Override
             public void onSwipeUp() {
-                if (game.state != Game.FINISHED && !running) resumeGame();
+                if (!running && game.state != Game.FINISHED && game.state != Game.WON) resumeGame();
                 game.moveUp();
             }
             @Override
             public void onSwipeDown() {
-                if (game.state != Game.FINISHED && !running) resumeGame();
+                if (!running && game.state != Game.FINISHED && game.state != Game.WON) resumeGame();
                 game.moveDown();
             }
 
@@ -172,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
         timer.cancel();
         pacTimer.cancel();
         saveHiscore();
+        game.state = Game.FINISHED;
 
         super.onDestroy();
     }
