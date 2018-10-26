@@ -16,14 +16,23 @@
         android:title="@string/action_settings">
         <menu>
             <item android:id="@+id/action_reset_hiscore"
-                android:title="@string/reset_hi_score"/>
+                android:title="@string/settings_reset_hi_score"/>
             <item android:id="@+id/action_time_limit"
-                android:title="@string/time_limit">
+                android:title="@string/settings_time_limit">
                 <menu>
                     <item android:id="@+id/time_60"
-                        android:title="@string/time_60"/>
+                        android:title="@string/settings_time_60"/>
                     <item android:id="@+id/time_120"
-                        android:title="@string/time_120"/>
+                        android:title="@string/settings_time_120"/>
+                </menu>
+            </item>
+            <item android:id="@+id/action_sound"
+                android:title="@string/settings_sound">
+                <menu>
+                    <item android:id="@+id/sound_on"
+                        android:title="@string/settings_sound_on"/>
+                    <item android:id="@+id/sound_off"
+                        android:title="@string/settings_sound_off"/>
                 </menu>
             </item>
         </menu>

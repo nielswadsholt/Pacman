@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -37,11 +38,21 @@ public class MainActivity extends AppCompatActivity {
     private boolean running;
     private Bundle runningInstanceState; // for saving state through stop / restart events
 
+    // sound
+    private SoundPlayer soundPlayer;
+
     @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         runningInstanceState = new Bundle();
+
+        //saying we want the game to run in one mode only
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setContentView(R.layout.activity_main);
+
+        // set up sound
+        soundPlayer = new SoundPlayer(this);
 
         // Set action bar title font to Pac-Man font
         TextView titleView = new TextView(this);
@@ -60,10 +71,6 @@ public class MainActivity extends AppCompatActivity {
             actionbar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
             actionbar.setCustomView(titleView);
         }
-
-        //saying we want the game to run in one mode only
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        setContentView(R.layout.activity_main);
 
         gameView =  findViewById(R.id.gameView);
 
@@ -164,15 +171,7 @@ public class MainActivity extends AppCompatActivity {
         //just to make sure if the app is killed, that we stop the timer.
         timer.cancel();
         pacTimer.cancel();
-
-        // save hi-score
-        game.updateHiscore();
-
-        SharedPreferences sharedPref =
-                getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt(getString(R.string.hiscore_key), game.getHiscore());
-        editor.apply();
+        saveHiscore();
 
         super.onDestroy();
     }
@@ -209,8 +208,17 @@ public class MainActivity extends AppCompatActivity {
             {
                 pacCounter++;
 
-                if (pacCounter % 2 == 0) {
-                    game.movePacman();
+                if (pacCounter % 2 == 0 && game.movePacman()) {
+                    // only play sound at half the frequency
+                    if (pacCounter % 4 == 0) {
+                        // run chomp sound in a background thread
+                        AsyncTask.execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                soundPlayer.playChompSound();
+                            }
+                        });
+                    }
                 }
 
                 if (pacCounter % 3 == 0) {
@@ -242,6 +250,7 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_reset_hiscore:
                 game.resetHiscore();
+                saveHiscore();
                 return true;
             case R.id.action_time_limit:
                 return true;
@@ -251,10 +260,8 @@ public class MainActivity extends AppCompatActivity {
                 timeLimitEditor = timeLimitPref.edit();
                 timeLimitEditor.putInt(getString(R.string.time_limit_key), 60);
                 timeLimitEditor.apply();
-
                 resumeGame();
                 gameView.restart();
-
                 return true;
             case R.id.time_120:
                 timeLimitPref =
@@ -262,10 +269,14 @@ public class MainActivity extends AppCompatActivity {
                 timeLimitEditor = timeLimitPref.edit();
                 timeLimitEditor.putInt(getString(R.string.time_limit_key), 120);
                 timeLimitEditor.apply();
-
                 resumeGame();
                 gameView.restart();
-
+                return true;
+            case R.id.sound_on:
+                soundPlayer.turnOn();
+                return true;
+            case R.id.sound_off:
+                soundPlayer.mute();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -286,6 +297,16 @@ public class MainActivity extends AppCompatActivity {
         timerView.setText(getResources().getString(R.string.time_txt, counter));
     }
 
+    void saveHiscore() {
+        game.updateHiscore();
+
+        SharedPreferences sharedPref =
+                getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt(getString(R.string.hiscore_key), game.getHiscore());
+        editor.apply();
+    }
+
     void pauseGame() {
         gameView.addPauseOverlay();
         running = false;
@@ -295,5 +316,13 @@ public class MainActivity extends AppCompatActivity {
         game.state = Game.ACTIVE;
         gameView.removeOverlay();
         running = true;
+    }
+
+    void playOneningMusic() {
+        soundPlayer.playOpeningMusic();
+    }
+
+    void playLostSound() {
+        soundPlayer.playLostSound();
     }
 }

@@ -50,7 +50,7 @@ class Game {
     // game state
     static final int READY = 0;
     static final int ACTIVE = 1;
-    static final int FINISHED = 3;
+    static final int FINISHED = 2;
 
     @IntDef({READY, ACTIVE, FINISHED})
     @interface GameState{}
@@ -62,7 +62,6 @@ class Game {
 
     // getters
     Bitmap getReadyBitmap() { return readyBitmap; }
-    int getHeight() { return h; }
     Bitmap getPacBitmap() { return pacBitmap; }
     Bitmap getBoardBitmap(){ return boardBitmap; }
     Matrix getPacMatrix() { return pacMatrix; }
@@ -73,6 +72,7 @@ class Game {
     int getPacY() {
         return pacY;
     }
+    int getHeight() { return h; }
     int getWidthOffset() { return widthOffset; }
     int getHeightOffset() { return heightOffset; }
     int getTileSize() { return tileSize; }
@@ -117,7 +117,7 @@ class Game {
 
         // reset pacman
         pacX = 13;
-        pacY = 23; //just some starting coordinates
+        pacY = 23;
         Log.d("newGame", "tileSize = " + tileSize
                 + ", pacOffset = " + pacOffset
                 + ", pacSize = " + pacSize);
@@ -158,6 +158,7 @@ class Game {
 
         // ready to start game
         state = READY;
+        ((MainActivity)context).playOneningMusic();
 
         //redraw screen
         gameView.invalidate();
@@ -300,7 +301,7 @@ class Game {
         gameView.invalidate();
     }
 
-    void movePacman()
+    boolean movePacman()
     {
         int newPacX = (pacX + nextDirX + w ) % w;
         int newPacY = (pacY + nextDirY + h) % h;
@@ -331,8 +332,6 @@ class Game {
             pacMatrix.postTranslate(scaleToMap(pacX) - pacOffset + widthOffset, scaleToMap(pacY) - pacOffset + heightOffset);
         }
 
-        eatDot();
-
         // game over or won?
         if (isEaten()) {
             gameOver();
@@ -342,10 +341,13 @@ class Game {
         }
 
         gameView.invalidate();
+
+        return eatDot();
     }
 
     void gameOver() {
         state = FINISHED;
+        ((MainActivity)context).playLostSound();
         gameView.endGame(gameView.getResources().getString(R.string.gameover));
     }
 
@@ -359,7 +361,6 @@ class Game {
 
     void resetHiscore() {
         hiscore = 0;
-
         hiscoreView.setText(context.getResources().getString(R.string.hiscore_txt, hiscore));
     }
 
@@ -384,7 +385,7 @@ class Game {
         changeDirection(0, 1);
     }
 
-    private void eatDot()
+    private boolean eatDot()
     {
         // eat dot and update score
         if (board[pacY][pacX] == '*') {
@@ -392,7 +393,11 @@ class Game {
             score += 10;
             board[pacY][pacX] = ' ';
             scoreView.setText(context.getResources().getString(R.string.score_txt, score));
+
+            return true;
         }
+
+        return false;
     }
 
     private boolean isEaten() {

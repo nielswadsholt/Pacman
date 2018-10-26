@@ -9,9 +9,12 @@
     <string name="gameover">Game Over</string>
     <string name="time_txt">Time left\n%1$d</string>
     <string name="hiscore_key">hiscore</string>
-    <string name="reset_hi_score">Reset hi-score</string>
+    <string name="settings_reset_hi_score">Reset hi-score</string>
     <string name="time_limit_key">time_limit</string>
-    <string name="time_limit">Time limit</string>
-    <string name="time_60">60 seconds</string>
-    <string name="time_120">120 seconds</string>
+    <string name="settings_time_limit">Time limit</string>
+    <string name="settings_time_60">60 seconds</string>
+    <string name="settings_time_120">120 seconds</string>
+    <string name="settings_sound">Sound</string>
+    <string name="settings_sound_on">On</string>
+    <string name="settings_sound_off">Off</string>
 </resources>
