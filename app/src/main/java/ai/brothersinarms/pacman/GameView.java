@@ -135,7 +135,6 @@ public class GameView extends View {
         ((MainActivity)context).saveHiscore();
         ((MainActivity)context).resetTime();
         path.reset();
-        game.state = Game.FINISHED;
         game.newGame();
     }
 

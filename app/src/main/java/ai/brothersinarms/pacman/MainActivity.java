@@ -244,6 +244,7 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_newGame:
                 resumeGame();
+                game.state = Game.FINISHED;
                 gameView.restart();
                 return true;
             case R.id.action_settings:
