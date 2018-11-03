@@ -168,11 +168,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         Log.d("lifeCycle", "onDestroy called");
-        //just to make sure if the app is killed, that we stop the timer.
-        timer.cancel();
-        pacTimer.cancel();
-        saveHiscore();
-        game.state = Game.FINISHED;
+        if (gameView.game != null) {
+            timer.cancel();
+            pacTimer.cancel();
+            saveHiscore();
+            game.state = Game.FINISHED;
+        }
 
         super.onDestroy();
     }
