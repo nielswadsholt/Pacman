@@ -162,7 +162,7 @@ class Game {
 
         // ready to start game
         state = READY;
-        ((MainActivity)context).playOneningMusic();
+        ((MainActivity)context).playOpeningMusic();
 
         //redraw screen
         gameView.invalidate();

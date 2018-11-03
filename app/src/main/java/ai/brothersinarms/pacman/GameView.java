@@ -134,6 +134,7 @@ public class GameView extends View {
     void restart() {
         ((MainActivity)context).saveHiscore();
         ((MainActivity)context).resetTime();
+        removeOverlay();
         path.reset();
         game.newGame();
     }

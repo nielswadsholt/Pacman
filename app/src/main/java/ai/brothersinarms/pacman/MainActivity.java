@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Timer pacTimer;
     private int pacCounter;
-    private int pacPeriod = 70; // number of milliseconds between each update
+    private int pacPeriod = 70;
 
     private boolean running;
     private Bundle runningInstanceState; // for saving state through stop / restart events
@@ -238,12 +238,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        SharedPreferences timeLimitPref;
-        SharedPreferences.Editor timeLimitEditor;
-
         switch (item.getItemId()) {
             case R.id.action_newGame:
-                resumeGame();
                 game.state = Game.FINISHED;
                 gameView.restart();
                 return true;
@@ -252,27 +248,14 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             case R.id.action_reset_hiscore:
                 game.resetHiscore();
-                saveHiscore();
                 return true;
             case R.id.action_time_limit:
                 return true;
             case R.id.time_60:
-                timeLimitPref =
-                        getPreferences(Context.MODE_PRIVATE);
-                timeLimitEditor = timeLimitPref.edit();
-                timeLimitEditor.putInt(getString(R.string.time_limit_key), 60);
-                timeLimitEditor.apply();
-                resumeGame();
-                gameView.restart();
+                setTimeLimit(60);
                 return true;
             case R.id.time_120:
-                timeLimitPref =
-                        getPreferences(Context.MODE_PRIVATE);
-                timeLimitEditor = timeLimitPref.edit();
-                timeLimitEditor.putInt(getString(R.string.time_limit_key), 120);
-                timeLimitEditor.apply();
-                resumeGame();
-                gameView.restart();
+                setTimeLimit(120);
                 return true;
             case R.id.sound_on:
                 soundPlayer.turnOn();
@@ -299,6 +282,20 @@ public class MainActivity extends AppCompatActivity {
         timerView.setText(getResources().getString(R.string.time_txt, counter));
     }
 
+    void setTimeLimit(int seconds) {
+        SharedPreferences timeLimitPref;
+        SharedPreferences.Editor timeLimitEditor;
+
+        timeLimitPref =
+                getPreferences(Context.MODE_PRIVATE);
+        timeLimitEditor = timeLimitPref.edit();
+        timeLimitEditor.putInt(getString(R.string.time_limit_key), seconds);
+        timeLimitEditor.apply();
+
+        game.state = Game.FINISHED;
+        gameView.restart();
+    }
+
     void saveHiscore() {
         game.updateHiscore();
 
@@ -320,7 +317,7 @@ public class MainActivity extends AppCompatActivity {
         running = true;
     }
 
-    void playOneningMusic() {
+    void playOpeningMusic() {
         soundPlayer.playOpeningMusic();
     }
 
