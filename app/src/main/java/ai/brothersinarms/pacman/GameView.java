@@ -140,9 +140,10 @@ public class GameView extends View {
     }
 
     void addPauseOverlay() {
-        Drawable overlay = getResources().getDrawable(R.drawable.pause_overlay);
-        overlay.setBounds(0, 0, getWidth(), getHeight());
-        getOverlay().add(overlay);
+        Drawable pauseOverlay = getResources().getDrawable(R.drawable.pause_overlay);
+        pauseOverlay.setBounds(0, 0, getWidth(), getHeight());
+        getOverlay().clear();
+        getOverlay().add(pauseOverlay);
     }
 
     void removeOverlay() {
