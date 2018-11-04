@@ -1,7 +1,7 @@
 # Pacman
-Mandatory Assignment in Android - PBA in Software Development, Autumn 2018 - Business Academy Aarhus
-
 Simplified Pac-Man clone with original game board and characters.
+
+Mandatory Assignment in Android - PBA in Software Development, Autumn 2018 - Business Academy Aarhus
 
 ## Licence
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License Version 3 as published by the Free Software Foundation.
