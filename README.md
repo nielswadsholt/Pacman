@@ -3,9 +3,6 @@ Simplified Pac-Man clone with original game board and characters.
 
 Mandatory Assignment in Android - PBA in Software Development, Autumn 2018 - Business Academy Aarhus
 
-## Licence
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License Version 3 as published by the Free Software Foundation.
-
 ## Sounds
 All sounds are modified/unmodified copies from https://github.com/masonicGIT/pacman/tree/master/sounds
 
@@ -20,3 +17,6 @@ The game uses the fonts Emulogic and Crack-Man taken from www.classicgaming.cc
 ## Screenshots
 
 ![Montage](montage.png)
+
+## Licence
+This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License Version 3 as published by the Free Software Foundation.
