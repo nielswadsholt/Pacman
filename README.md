@@ -17,6 +17,3 @@ The game uses the fonts Emulogic and Crack-Man taken from www.classicgaming.cc
 ## Screenshots
 
 ![Montage](montage.png)
-
-## Licence
-This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License Version 3 as published by the Free Software Foundation.
